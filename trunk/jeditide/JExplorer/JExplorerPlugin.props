@@ -1,0 +1,270 @@
+# Properties file for JExplorer plugin
+
+# general plugin information
+plugin.jexplorer.JExplorerPlugin.name=JExplorer
+plugin.jexplorer.JExplorerPlugin.author=Amedeo Farello
+plugin.jexplorer.JExplorerPlugin.version=0.3.1
+plugin.jexplorer.JExplorerPlugin.docs=jexplorer.html
+
+# dependences
+plugin.jexplorer.JExplorerPlugin.depend.0=jdk 1.3
+plugin.jexplorer.JExplorerPlugin.depend.1=jedit 04.01.99.00
+plugin.jexplorer.JExplorerPlugin.depend.2=plugin projectviewer.ProjectPlugin 2.0.2
+plugin.jexplorer.JExplorerPlugin.depend.3=plugin errorlist.ErrorListPlugin 1.2.3
+
+# menu labels for actions supplied by dockables.xml
+jexplorer-index.label=Index
+jexplorer-graph.label=Graph
+
+# menu labels for actions supplied by actions.xml
+jexplorer-editModels.label=Models...
+jexplorer-selAtCursor.label=Select Item at Cursor
+jexplorer-selAtCursorSrcPos.label=Select Item at Cursor (pos. source)
+
+# submenu title in the plugins menu
+jexplorer-menu.label=JExplorer
+
+# submenu structure
+jexplorer-menu=\
+	jexplorer-editModels \
+	- \
+	jexplorer-index \
+	jexplorer-graph \
+	- \
+	jexplorer-index-float \
+	jexplorer-graph-float \
+	- \
+	jexplorer-selAtCursor \
+	jexplorer-selAtCursorSrcPos
+
+# window title
+jexplorer-index.title=JExplorer Index
+jexplorer-graph.title=JExplorer Graph
+
+# options pane title in global options list
+options.jexplorer.label=JExplorer
+
+# Default GLOBAL user properties
+
+# fonts
+jexplorer.fontStandard=Default
+jexplorer.fontStandardsize=11
+jexplorer.fontStandardstyle=0
+
+jexplorer.fontAbstract=Default
+jexplorer.fontAbstractsize=11
+jexplorer.fontAbstractstyle=2
+
+jexplorer.fontFinal=Default
+jexplorer.fontFinalsize=11
+jexplorer.fontFinalstyle=1
+
+# colors
+jexplorer.colorClasses=\#000000
+jexplorer.colorInterfaces=\#3366ff
+jexplorer.colorInclusion=\#ff6666
+jexplorer.colorFields=\#666666
+jexplorer.colorConstructors=\#bb3300
+jexplorer.colorMethods=\#006633
+# NOT IMPLEMENTED jexplorer.colorOverriding=\#009966
+
+jexplorer.parseOnKeystrokeDelay=1500
+
+# Default MODEL user properties
+
+# elements visualization (common)
+jexplorer.useShortNames=false
+jexplorer.useShortNames.tooltip=Use local names
+
+jexplorer.showAccessSymbols=true
+jexplorer.showAccessSymbols.tooltip=Show UML symbols
+
+# NOT IMPLEMENTED jexplorer.hiliteOverrMethods=true
+# NOT IMPLEMENTED jexplorer.hiliteOverrMethods.tooltip=Hilite overriding methods
+
+jexplorer.showDeprecated=true
+jexplorer.showDeprecated.tooltip=Show deprecated
+
+jexplorer.pkgcol.tooltip=Package colors...
+jexplorer.library.tooltip=Libraries...
+
+jexplorer.colorizePackages=true
+jexplorer.colorizePackages.tooltip=Show package colors
+
+# files management
+jexplorer.modelStatus.tooltip=Indicates the model status
+
+# elements visualization (index panel)
+jexplorer.index.showClasses=true
+jexplorer.index.showClasses.tooltip=Show classes
+
+jexplorer.index.showInterfaces=true
+jexplorer.index.showInterfaces.tooltip=Show interfaces
+
+jexplorer.index.showNested=true
+jexplorer.index.showNested.tooltip=Show nested elements
+
+jexplorer.index.showFields=false
+jexplorer.index.showFields.tooltip=Show fields
+
+jexplorer.index.showConstructors=false
+jexplorer.index.showConstructors.tooltip=Show constructors
+
+jexplorer.index.showMethods=false
+jexplorer.index.showMethods.tooltip=Show methods
+
+jexplorer.index.showPublicAccess=true
+jexplorer.index.showPublicAccess.tooltip=Show public items
+
+jexplorer.index.showProtectedAccess=true
+jexplorer.index.showProtectedAccess.tooltip=Show protected items
+
+jexplorer.index.showPrivateAccess=true
+jexplorer.index.showPrivateAccess.tooltip=Show private items
+
+jexplorer.index.showPackageAccess=true
+jexplorer.index.showPackageAccess.tooltip=Show package protected items
+
+# elements visualization (details panel)
+jexplorer.detail.showNested=true
+jexplorer.detail.showNested.tooltip=Show nested elements
+
+jexplorer.detail.showFields=true
+jexplorer.detail.showFields.tooltip=Show fields
+
+jexplorer.detail.showConstructors=true
+jexplorer.detail.showConstructors.tooltip=Show constructors
+
+jexplorer.detail.showMethods=true
+jexplorer.detail.showMethods.tooltip=Show methods
+
+jexplorer.detail.showPublicAccess=true
+jexplorer.detail.showPublicAccess.tooltip=Show public members
+
+jexplorer.detail.showProtectedAccess=true
+jexplorer.detail.showProtectedAccess.tooltip=Show protected members
+
+jexplorer.detail.showPrivateAccess=true
+jexplorer.detail.showPrivateAccess.tooltip=Show private members
+
+jexplorer.detail.showPackageAccess=true
+jexplorer.detail.showPackageAccess.tooltip=Show package protected members
+
+# graph layout
+jexplorer.graph.layout=0
+jexplorer.graph.layout.tooltip=Choose elements layout
+
+# graph selection
+jexplorer.graph.sel.center=true
+jexplorer.graph.sel.center.tooltip=Centre diagram upon selected element
+
+jexplorer.graph.sel.applyFilter=false
+jexplorer.graph.sel.applyFilter.tooltip=Show only selected element relatives
+
+jexplorer.graph.sel.relatives=1
+jexplorer.graph.sel.relatives.tooltip=Choose relatives to show
+
+# graph connections visualization
+jexplorer.graph.conn.showRelevantOnly=false
+jexplorer.graph.conn.showRelevantOnly.tooltip=Show only layout-relevant relationships
+
+jexplorer.graph.conn.showDerivation=true
+jexplorer.graph.conn.showDerivation.tooltip=Show derivation relationships
+
+jexplorer.graph.conn.showImplementation=true
+jexplorer.graph.conn.showImplementation.tooltip=Show implementation relationships
+
+jexplorer.graph.conn.showNesting=true
+jexplorer.graph.conn.showNesting.tooltip=Show nesting relationships
+
+# User Interface text
+
+jexplorer.ui.options.fonts.title=Fonts
+jexplorer.ui.options.fontStandard.label=Standard Items
+jexplorer.ui.options.fontStandard.tooltip=This font is used for standard items representation
+jexplorer.ui.options.fontAbstract.label='abstract' Items
+jexplorer.ui.options.fontAbstract.tooltip=This font is used for "abstract" items representation
+jexplorer.ui.options.fontFinal.label='final' Items
+jexplorer.ui.options.fontFinal.tooltip=This font is used for "final" items representation
+
+jexplorer.ui.options.colors.title=Colors
+jexplorer.ui.options.colorClasses.label=Classes & Derivation
+jexplorer.ui.options.colorClasses.tooltip=This color is used to represent classes and derivation relationships
+jexplorer.ui.options.colorInterfaces.label=Interfaces & Implementation
+jexplorer.ui.options.colorInterfaces.tooltip=This color is used to represent interfaces and implementation relationships
+jexplorer.ui.options.colorInclusion.label=Nesting
+jexplorer.ui.options.colorInclusion.tooltip=This color is used to represent nesting relationships
+jexplorer.ui.options.colorFields.label=Fields
+jexplorer.ui.options.colorFields.tooltip=This color is used to represent fields
+jexplorer.ui.options.colorConstructors.label=Constructors
+jexplorer.ui.options.colorConstructors.tooltip=This color is used to represent constructors
+jexplorer.ui.options.colorMethods.label=Methods
+jexplorer.ui.options.colorMethods.tooltip=This color is used to represent methods
+
+jexplorer.ui.options.models.title=Models
+jexplorer.ui.options.modelsDelay.label=Rebuilding delay
+jexplorer.ui.options.modelsDelay.tooltip=Time to wait after last keystroke in seconds
+
+jexplorer.ui.noModel=NO REFERENCE MODEL
+jexplorer.ui.graphLayout1=Derivation
+jexplorer.ui.graphLayout2=Implementation
+jexplorer.ui.graphLayout3=Nesting
+jexplorer.ui.selectedRelatives1=Ancestors
+jexplorer.ui.selectedRelatives2=All
+jexplorer.ui.selectedRelatives3=Descendants
+
+jexplorer.ui.modelSelector.tooltip=Choose reference model
+
+jexplorer.ui.history.back.tooltip=Go back to previous item
+jexplorer.ui.history.backPopup.tooltip=Show previous items
+jexplorer.ui.history.forw.tooltip=Go forward to next item
+jexplorer.ui.history.forwPopup.tooltip=Show next items
+
+jexplorer.ui.mgrdlg.title=JExplorer Models
+jexplorer.ui.mgrdlg.upToDateDialog.label=Do you want to keep this model up-to-date?
+jexplorer.ui.mgrdlg.removeDialog.label=Are you sure to remove this model?
+jexplorer.ui.mgrdlg.addBtn.label=Create
+jexplorer.ui.mgrdlg.addBtn.tooltip=Creates a new model for the selected project
+jexplorer.ui.mgrdlg.removeBtn.label=Remove...
+jexplorer.ui.mgrdlg.removeBtn.tooltip=Removes the model for the selected project
+jexplorer.ui.mgrdlg.editBtn.label=Properties...
+jexplorer.ui.mgrdlg.editBtn.tooltip=Opens a dialog to set properties for the selected model
+jexplorer.ui.mgrdlg.libBtn.label=Libraries...
+jexplorer.ui.mgrdlg.libBtn.tooltip=Opens a dialog to choose libraries for the selected model
+jexplorer.ui.mgrdlg.pkgBtn.label=Package Colors...
+jexplorer.ui.mgrdlg.pkgBtn.tooltip=Opens a dialog to choose package colors for the selected model
+
+jexplorer.ui.moddlg.title=Properties of model: 
+jexplorer.ui.moddlg.rebuild.label=Rebuild model
+jexplorer.ui.moddlg.change.label=When buffers change
+jexplorer.ui.moddlg.change.tooltip=Rebuilds the model when a file belonging to its project changes
+jexplorer.ui.moddlg.save.label=When buffers are saved
+jexplorer.ui.moddlg.save.tooltip=Rebuilds the model when a file belonging to its project is saved
+jexplorer.ui.moddlg.never.label=Never
+jexplorer.ui.moddlg.never.tooltip=The model is never rebuilt 
+jexplorer.ui.moddlg.buildBtn.label=Update
+jexplorer.ui.moddlg.buildBtn.tooltip=Updates the model now
+
+jexplorer.ui.pkgdlg.title=Package Colors of model: 
+jexplorer.ui.pkgdlg.addPackageDialog.title=Add package
+jexplorer.ui.pkgdlg.addPackageDialog.label=Package name:
+jexplorer.ui.pkgdlg.colorChooser.title=Choose the color
+jexplorer.ui.pkgdlg.addBtn.label=Add...
+jexplorer.ui.pkgdlg.addBtn.tooltip=Adds a new package colorization specification
+jexplorer.ui.pkgdlg.removeBtn.label=Remove
+jexplorer.ui.pkgdlg.removeBtn.tooltip=Removes the selected package colorization specification
+jexplorer.ui.pkgdlg.editBtn.label=Edit...
+jexplorer.ui.pkgdlg.editBtn.tooltip=Opens a dialog to choose the color for the selected package colorization specification
+
+jexplorer.ui.libdlg.title=Libraries of model: 
+jexplorer.ui.libdlg.fileChooser.title=Choose the library
+jexplorer.ui.libdlg.addBtn.label=Add...
+jexplorer.ui.libdlg.addBtn.tooltip=Adds a new library to the current model
+jexplorer.ui.libdlg.removeBtn.label=Remove
+jexplorer.ui.libdlg.removeBtn.tooltip=Removes the selected library from the current model
+
+jexplorer.ui.err.notParsed=File needs to be parsed
+jexplorer.ui.err.syntax=Syntax error
+jexplorer.ui.err.lexical=Lexical error
+jexplorer.ui.err.unexpected=Parser internal error, please see Activity Log
+

@@ -1,0 +1,56 @@
+ChangeLog for the JExplorer plugin
+
+VERSION 0.3.1 (2003.07.27)
+
+- Updated for ProjectViewer 2.0.2, so that project files additions and removals,
+  and project name changes can be correctly handled.
+
+VERSION 0.3 (2003.06.29)
+
+- The user can now choose to have a model automatically rebuilt when a buffer
+  changes, or when it's saved, or never. This can be set independently for each
+  model from the model "Properties" dialog.
+- Models are no longer automatically rebuilt when such options change. Instead,
+  a new "Update" button in the "Properties" dialog permits to reparse and build
+  the model anytime.
+- A "Rebuilding delay" ranging from 0.5 to 3.5 seconds can be set in the global
+  options dialog. This determines how much time JExplorer must wait after the
+  last keystroke before rebuilding the model when the "When buffers change"
+  option in the "Properties" dialog is selected.
+- Selection is now preserved even when a model can't be rebuilt due to errors.
+  As soon as the model is successfully rebuilt, selection will be restored if the
+  corresponding item still exists.
+- Clicking upon an already selected item now positions the jEdit buffer upon the
+  corresponding code each time. This previously happened only when selection
+  actually changed.
+- JExplorer's dockables do not flash anymore when a model is rebuilt.
+- All icons now have 32 bpp depth, since 1, 2 and 4 bpp icons were incorrectly
+  rendered on Linux. (Thanks to Dave Landers for his help).
+
+VERSION 0.2.1 (2003.05.23)
+
+- Besides libraries, "type-import-on-demand" imports resolution now includes
+  project sources. This bug caused incorrect graph drawing due to unresolved
+  references.
+- Minor updates to documentation.
+
+VERSION 0.2 (2003.05.15)
+
+- The rendering colors for fields, constructors and methods can now be set,
+  independently.
+- The background color of the Graph window is now equal to the background color
+  of standard Trees (was always white).
+- When the "Show package colors" option is not active or an item does not have
+  a matching package-color definition, the color of items in the Graph window and
+  the color of package indicators in the Index window is now equal to the
+  background color (was always white).
+- The documentation is now more complete and a TOC has been added.
+- The model selector combo box now shows a tooltip.
+- Popup menus are now forced inside the screen boundaries.
+- When multiple files are saved at once using jEdit's "Save All..." command, the
+  corresponding model is now rebuilt only once (Thanks Slava).
+- It isn't possible to open multiple instances of the "Models" dialog anymore.
+
+VERSION 0.1 (2003.05.06)
+
+- Initial release, for jEdit 4.1 final

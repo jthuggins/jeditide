@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<!-- Dockable component definition file for JExplorer plugin -->
+
+<!DOCTYPE DOCKABLES SYSTEM "dockables.dtd">
+
+<!-- JExplorer dockable windows -->
+
+<DOCKABLES>
+
+	<DOCKABLE NAME="jexplorer-index">
+		new jexplorer.gui.IndexDockable(view, position);
+	</DOCKABLE>
+
+	<DOCKABLE NAME="jexplorer-graph">
+		new jexplorer.gui.GraphDockable(view, position);
+	</DOCKABLE>
+
+</DOCKABLES>
