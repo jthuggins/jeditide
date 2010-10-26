@@ -1,0 +1,866 @@
+<!-- :folding=explicit:collapseFolds=1: -->
+<html>
+<head>
+	<title>JExplorer&nbsp;Plugin</title>
+	<link rel="stylesheet" type="text/css" href="jexplorer.css">
+</head>
+
+<body>
+<!-- {{{ Title -->
+<table
+    bgcolor="#cccc99"
+    cellspacing="0"
+    border="0"
+    width="100%">
+    <tr colspan=2>
+        <td valign="top">
+			<font size="+3"><strong>JExplorer&nbsp;</strong>plugin</font>
+		</td>
+   <tr>
+        <td>
+			<br>
+			<strong>&copy;2003 Amedeo&nbsp;Farello&nbsp;-&nbsp;afarello&#064;libero.it</strong>
+		</td>
+        <td align="right">
+			<br>
+			Version 0.3.1 (2003.07.27)
+        </td>
+     <tr>
+    </tr>
+</table>
+<!-- }}} -->
+
+<!-- {{{ TOC -->
+<ul>
+	<li><a href=#Introduction>Introduction</a></li>
+	<li><a href=#Requirements>Requirements</a></li>
+	<li><a href=#Jump_start>Jump start</a></li>
+	<li><a href=#Models>Models</a></li>
+	<ul>
+		<li><a href=#Models_dialog>The models dialog</a></li>
+		<li><a href=#Libraries>Libraries</a></li>
+		<li><a href=#PackageColors>Package-color definitions</a></li>
+	</ul>
+	<li><a href=#User_interface>User interface</a></li>
+	<ul>
+		<li><a href=#Index_window>The Index window</a></li>
+		<ul>
+			<li><a href=#Index_window_common_toolbar>The common toolbar</a></li>
+			<li><a href=#Index_window_global_index>The global index</a></li>
+			<li><a href=#Index_window_members_panel>The members panel</a></li>
+		</ul>
+		<li><a href=#Graph_window>The Graph window</a></li>
+		<li><a href=#Code_navigation>Code navigation</a></li>
+	</ul>
+	<li><a href=#Global_options>Global options</a></li>
+	<li><a href=#Known_bugs>Known bugs</a></li>
+</ul>
+<!-- }}} -->
+
+<!-- {{{ Introduction -->
+<h3><a name="Introduction">Introduction</a></h3>
+<p>JExplorer is a Java code browser. Starting from a ProjectViewer plugin
+project, it can analyze the Java source files in it and build a
+&quot;model&quot;, which is then used to navigate the code.</p>
+
+<p>JExplorer features are:</p>
+<ul>
+	<li>
+	combined list / tree / graph visualization to help comprehension of code
+	structure and to rapidly locate classes, interfaces, fields, constructors
+	and methods;
+	</li>
+	<li>
+	graphical representation of derivation, implementation and nesting
+	relationships amongst classes and interfaces, with optional use of selection
+	to focus on a reduced set of elements;
+	</li>
+	<li>
+	fast search of any defined item by partial name typing in a global index;
+	</li>
+	<li>
+	visualization of items optionally filtered according to type and attributes;
+	</li>
+	<li>
+	bi-directional navigation of source code.
+	</li>
+</ul>
+
+<h3><a name="Requirements">Requirements</a></h3>
+<ul>
+	<li>JDK 1.3</li>
+	<li>jEdit 4.1final</li>
+	<li>ProjectViewer 2.0.2</li>
+	<li>ErrorList 1.2.3</li>
+</ul>
+
+<h3><a name="Jump_start">Jump start</a></h3>
+<ul>
+	<li>Build a ProjectViewer project containing at least a valid .java file</li>
+	<li>Select <b>Plugins&gt;JExplorer&gt;Models...</b></li>
+	<li>In the &quot;JExplorer Models&quot; dialog, select your project and press
+	the &quot;Create&quot; button.</li>
+	<li>Select <b>Plugins&gt;JExplorer&gt;Index</b></li>
+	<li>Select your project in the combo box at the top of the window.</li>
+	<li>Click an entry in the index.</li>
+</ul>
+<!-- }}} -->
+
+<p>Now, for those less in a hurry...</p>
+
+<!-- {{{ Models -->
+<h3><a name="Models">Models</a></h3>
+<p>The items that constitute a model are Java classes, interfaces, fields,
+constructors and methods. A model is built by parsing each source file in a
+project and extracting information about every defined item.</p>
+
+<p>There can be only a single model for each ProjectViewer project. The project
+is used to determine which files must be taken into account to build the model
+and to store model properties.</p>
+
+<p>Each model has its own current selection and set of properties. Many
+JExplorer windows can refer to the same model: this means they will share the
+same selection and options.</p>
+
+<p>Models, unlike projects, are not persistent. When the jEdit session is
+terminated, models are lost. Model properties are instead persistent and
+remembered between sessions.</p>
+
+<p>When a source file belonging to a model changes after the model is built
+for the first time, the model may become obsolete. JExplorer offers three
+options to deal with this:</p>
+<ul>
+	<li>
+	if a jEdit buffer containing a file that belongs to the model changes,
+	the model is automatically updated after a user-settable delay from the
+	last keystroke (this is the default behaviour);
+	</li>
+	<li>
+	if a jEdit buffer containing a file that belongs to the model is saved,
+	the model is automatically updated;
+	</li>
+	<li>
+	the model is never automatically updated, but can be updated at user command;
+	</li>
+</ul>
+
+<p>Please see the <a href=#Models_dialog>The models dialog</a> and the
+<a href=#Global_options>Global options</a> sections for more information.</p>
+
+<p>If a source file cannot be succesfully parsed due to some error, a
+corresponding error entry in the ErrorList plugin window is generated.</p>
+<!-- }}} -->
+
+<!-- {{{ Models dialog -->
+<h4><a name="Models_dialog">The models dialog</a></h4>
+<p>Models are created and destroyed from the Models dialog. The dialog shows all
+existing ProjectViewer projects, with bold type indicating that a project is
+already loaded. To create a model for a project, select its row in the list and
+click the &quot;Create&quot; button. To remove it, click the &quot;Create&quot;
+button.</p>
+
+<p>Creation takes place in background and may take a few seconds or much more,
+depending on the project complexity. When a model is available, the
+corresponding row shows a &quot;M&quot; and two icons.</p>
+
+<p>The first icon indicates the update policy for the model and can appear as
+follows:</p>
+<table align="center">
+	<tr>
+		<td><img src="images/buttons/rebuildOnChange.png"></td>
+		<td><i>the model is rebuilt when a jEdit buffer changes
+		(this is the default)</i>
+	</tr>
+	<tr>
+		<td><img src="images/buttons/rebuildOnSave.png"></td>
+		<td><i>the model is rebuilt when a jEdit buffer is saved</i></td>
+	</tr>
+	<tr>
+		<td><img src="images/buttons/rebuildNever.png"></td>
+		<td><i>the model is never rebuilt</i></td>
+	</tr>
+</table>
+
+<p>To change this setting, check the corresponding option in the
+&quot;Properties&quot; dialog that appears when double clicking on the model row
+or pushing the &quot;Properties...&quot; button. This dialog also contains an
+&quot;Update&quot; button that immediately updates the model as needed.</p>
+
+<p>The second icon indicates <a name="ModelStatus">model status</a> and can
+appear as follows:</p>
+<table align="center">
+	<tr>
+		<td><img src="images/buttons/modelReady.png"></td>
+		<td><i>the model has been succesfully built and is ready to use</i></td>
+	</tr>
+	<tr>
+		<td><img src="images/buttons/modelParsing.png"></td>
+		<td><i>the model is being parsed</i></td>
+	</tr>
+	<tr>
+		<td><img src="images/buttons/modelDefective.png"></td>
+		<td><i>the model could not be parsed succesfully</i>
+		<br>(Look for errors in the Error List plugin window)</td>
+	</tr>
+	<tr>
+		<td><img src="images/buttons/modelObsolete.png"></td>
+		<td><i>the model is not kept up-to-date</i></td>
+	</tr>
+</table>
+
+<h4><a name="Libraries">Libraries</a></h4>
+<p>The &quot;Libraries...&quot; button of the &quot;Models&quot; dialog opens
+the &quot;Libraries&quot; dialog for the selected model.
+A library is a .jar or .zip file containing Java .class files. JExplorer uses
+libraries to resolve simple type names to fully qualified names.
+Each model can have an unlimited set of libraries and these can be added or
+removed with the corresponding buttons in the dialog.</p>
+
+<h4><a name="PackageColors">Package-color definitions</a></h4>
+<p>The &quot;Package Colors...&quot; button of the &quot;Models&quot; dialog
+opens the &quot;Package Colors...&quot; dialog for the selected model.
+A package-color definition is used to draw items belonging to a package in the
+specified color, to better distinguish them in JExplorer windows.
+Each model can have an unlimited set of package-color definitions and these can
+be added, removed or edited with the corresponding buttons in the dialog.</p>
+<!-- }}} -->
+
+<h3><a name="User_interface">User interface</a></h3>
+<p>JExplorer uses two types of dockable windows, Index and Graph. You may want
+to have them docked, respectively to the left side and to the bottom side.
+Other floating instances of both types can be opened using
+<b>Plugins&gt;JExplorer&gt;Index (New Floating Instance)</b> or
+<b>Plugins&gt;JExplorer&gt;Graph (New Floating Instance)</b>.</p>
+
+<!-- {{{ Index window -->
+<h4><a name="Index_window">The Index window</a></h4>
+<p>This window is divided in two parts by a movable divider. You can completely
+hide one part or the other using the little arrows on the divider.</p>
+
+<p>The upper portion, the <i>global index</i>, shows an alphabetically sorted
+list of all known items (classes, interfaces and members), while the lower
+portion, the <i>members panel</i>, shows the members belonging to the currently
+selected class or interface. Each portion has its own toolbar, while there is a
+common toolbar at the top.</p>
+<!-- }}} -->
+
+<!-- {{{ Index window common toolbar -->
+<h5><a name="Index_window_common_toolbar">The common toolbar</a></h5>
+<p>The common toolbar contains the following controls:</p>
+
+<table align="center">
+	<tr>
+		<td></td>
+		<td class="header" width="25%">Name</td>
+		<td class="header">Function</td>
+	</tr>
+	<tr>
+		<td class="header"></td>
+		<td class="name">Model selector</td>
+		<td class="content">Use this combo box to select a reference model between
+		those available.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/modelReady.png"></td>
+		<td class="name">Model status</td>
+		<td class="content">The meaning of this icon is the same described
+		<a href=#ModelStatus>here</a>.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/back.png"></td>
+		<td class="name">Go back to previous item</td>
+		<td class="content">Selects the last visited item.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/openPopup.png"></td>
+		<td class="name">Show previous items</td>
+		<td class="content">Opens a history popup menu showing the last selected items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/forward.png"></td>
+		<td class="name">Go forward to next item</td>
+		<td class="content">Selects the next visited item.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/openPopup.png"></td>
+		<td class="name">Show next items</td>
+		<td class="content">Opens a history popup menu showing the next selected items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/useShortNames.png"></td>
+		<td class="name">Use local names</td>
+		<td class="content">When this option is enabled, items are represented with their local
+		name (e.g. <code>Vector</code>), otherwise their fully qualified name is
+		used, (e.g. <code>java.util.Vector</code>).</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showAccessSymbols.png"></td>
+		<td class="name">Show UML symbols</td>
+		<td class="content">When this option is enabled, items declared <i>static</i>
+		are underlined and a symbol indicates items access specification
+		as follows:
+		<table>
+			<tr>
+				<td><img src="images/public.png"></td>
+				<td>if the item is declared &quot;public&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/protected.png"></td>
+				<td>if the item is declared &quot;protected&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/private.png"></td>
+				<td>if the item is declared &quot;private&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/package.png"></td>
+				<td>if the item does not have an access specification, i.e. is
+				&quot;package protected&quot;</td>
+			</tr>
+		</table></td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/deprecated.png"></td>
+		<td class="name">Show deprecated</td>
+		<td class="content">When this option is enabled, a red cross marks
+		deprecated items.</td>
+	</tr>
+</table>
+<!-- }}} -->
+
+<!-- {{{ Index window global index -->
+<h5><a name="Index_window_global_index">The global index</a></h5>
+<p>Within the <i>global index</i>, items are represented as follows:</p>
+
+<table align="center">
+	<tr>
+		<td class="header">Item</td>
+		<td class="header"></td>
+		<td class="header">Textual representation</td>
+	</tr>
+	<tr>
+		<td class="name">class</td>
+		<td class="header"><img src="images/class.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">nested class</td>
+		<td class="header"><img src="images/nestedClass.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">interface</td>
+		<td class="header"><img src="images/interface.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">nested interface</td>
+		<td class="header"><img src="images/nestedInterface.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">field</td>
+		<td class="header"><img src="images/field.png"></td>
+		<td class="content">name [declaring element]</td>
+	</tr>
+	<tr>
+		<td class="name">constructor</td>
+		<td class="header"><img src="images/constructor.png"></td>
+		<td class="content">name(parameters-list) [declaring element]</td>
+	</tr>
+	<tr>
+		<td class="name">method</td>
+		<td class="header"><img src="images/method.png"></td>
+		<td class="content">name(parameters-list) [declaring element]</td>
+	</tr>
+</table>
+
+<p>The <i>global index</i> toolbar has the following options:</p>
+
+<table align="center">
+	<tr>
+		<td></td>
+		<td class="header" width="25%">Name</td>
+		<td class="header">Function</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/class.png"></td>
+		<td class="name">Show classes</td>
+		<td class="content">Enables visualization of classes.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/interface.png"></td>
+		<td class="name">Show interfaces</td>
+		<td class="content">Enables visualization of interfaces.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/nestedClass.png"></td>
+		<td class="name">Show nested elements</td>
+		<td class="content">Enables visualization of nested classes and inerfaces.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/field.png"></td>
+		<td class="name">Show fields</td>
+		<td class="content">Enables visualization of fields.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/constructor.png"></td>
+		<td class="name">Show constructors</td>
+		<td class="content">Enables visualization of constructors.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/method.png"></td>
+		<td class="name">Show methods</td>
+		<td class="content">Enables visualization of methods.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/colorizePackages.png"></td>
+		<td class="name">Show package colors</td>
+		<td class="content">When this option is enabled, a coloured rectangle
+		representing the package is inserted between the item's symbol and name.
+		</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPublicAccess.png"></td>
+		<td class="name">Show public items</td>
+		<td class="content">Enables visualization of &quot;public&quot; items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showProtectedAccess.png"></td>
+		<td class="name">Show protected items</td>
+		<td class="content">Enables visualization of &quot;protected&quot; items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPrivateAccess.png"></td>
+		<td class="name">Show private items</td>
+		<td class="content">Enables visualization of &quot;private&quot; items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPackageAccess.png"></td>
+		<td class="name">Show package protected items</td>
+		<td class="content">Enables visualization of &quot;package protected&quot; items.</td>
+	</tr>
+	<tr>
+		<td class="header"></td>
+		<td class="name">Search field</td>
+		<td class="content">Typing something in this text field automatically positions
+		the <i>global index</i> upon the first item that matches the input text.</td>
+	</tr>
+</table>
+<!-- }}} -->
+
+<!-- {{{ Index window members panel -->
+<h5><a name="Index_window_members_panel">The members panel</a></h5>
+<p>Within the <i>members panel</i>, items are represented as follows:</p>
+
+<table align="center">
+	<tr>
+		<td class="header">Item</td>
+		<td class="header"></td>
+		<td class="header">Textual representation</td>
+	</tr>
+	<tr>
+		<td class="name">class</td>
+		<td class="header"><img src="images/class.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">nested class</td>
+		<td class="header"><img src="images/nestedClass.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">interface</td>
+		<td class="header"><img src="images/interface.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">nested interface</td>
+		<td class="header"><img src="images/nestedInterface.png"></td>
+		<td class="content">name</td>
+	</tr>
+	<tr>
+		<td class="name">field</td>
+		<td class="header"><img src="images/field.png"></td>
+		<td class="content">name : type
+	<table>
+		<tr>
+			<td></td>
+			<td><img src="images/transient.png"></td>
+			<td><i>indicates a field declared &quot;transient&quot;</i></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><img src="images/volatile.png"></td>
+			<td><i>indicates a field declared &quot;volatile&quot;</i></td>
+		</tr>
+	</table></td>
+	</tr>
+	<tr>
+		<td class="name">constructor</td>
+		<td class="header"><img src="images/constructor.png"></td>
+		<td class="content">name(parameters-list)
+	<table>
+		<tr>
+			<td></td>
+			<td><img src="images/throws.png"></td>
+			<td><i>indicates a constructor that can throw an exception</i></td>
+		</tr>
+	</table></td>
+	</tr>
+	<tr>
+		<td class="name">method</td>
+		<td class="header"><img src="images/method.png"></td>
+		<td class="content">name(parameters-list) : return type
+	<table>
+		</tr>
+		<tr>
+			<td></td>
+			<td><img src="images/native.png"></td>
+			<td><i>indicates a method declared &quot;native&quot;</i></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><img src="images/synchronized.png"></td>
+			<td><i>indicates a method declared &quot;synchronized&quot;</i></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td><img src="images/throws.png"></td>
+			<td><i>indicates a method that can throw an exception</i></td>
+		</tr>
+	</table></td>
+</table>
+
+<p>The <i>members panel</i> toolbar has the following options:</p>
+
+<table align="center">
+	<tr>
+		<td></td>
+		<td class="header" width="25%">Name</td>
+		<td class="header">Function</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/nestedClass.png"></td>
+		<td class="name">Show nested elements</td>
+		<td class="content">Enables visualization of nested classes and inerfaces.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/field.png"></td>
+		<td class="name">Show fields</td>
+		<td class="content">Enables visualization of fields.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/constructor.png"></td>
+		<td class="name">Show constructors</td>
+		<td class="content">Enables visualization of constructors.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/method.png"></td>
+		<td class="name">Show methods</td>
+		<td class="content">Enables visualization of methods.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPublicAccess.png"></td>
+		<td class="name">Show public members</td>
+		<td class="content">Enables visualization of &quot;public&quot; members.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showProtectedAccess.png"></td>
+		<td class="name">Show protected members</td>
+		<td class="content">Enables visualization of &quot;protected&quot; members.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPrivateAccess.png"></td>
+		<td class="name">Show private members</td>
+		<td class="content">Enables visualization of &quot;private&quot; members.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showPackageAccess.png"></td>
+		<td class="name">Show package protected members</td>
+		<td class="content">Enables visualization of &quot;package protected&quot; members.</td>
+	</tr>
+</table>
+<!-- }}} -->
+
+<!-- {{{ Graph window -->
+<h4><a name="Graph_window">The Graph window</a></h4>
+<p>This window shows relationships between classes and interfaces graphically.</p>
+<!-- }}} -->
+
+<!-- {{{ Graph window toolbar -->
+<p>Its toolbar contains the following controls:</p>
+
+<table align="center">
+	<tr>
+		<td></td>
+		<td class="header" width="25%">Name</td>
+		<td class="header">Function</td>
+	</tr>
+	<tr>
+		<td class="header"></td>
+		<td class="name">Model selector</td>
+		<td class="content">Use this combo box to select a reference model between
+		those available.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/modelReady.png"></td>
+		<td class="name">Model status</td>
+		<td class="content">The meaning of this icon is the same described
+		<a href=#ModelStatus>here</a>.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/back.png"></td>
+		<td class="name">Go back to previous item</td>
+		<td class="content">Selects the last visited item.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/openPopup.png"></td>
+		<td class="name">Show previous items</td>
+		<td class="content">Opens a history popup menu showing the last selected items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/forward.png"></td>
+		<td class="name">Go forward to next item</td>
+		<td class="content">Selects the next visited item.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/openPopup.png"></td>
+		<td class="name">Show next items</td>
+		<td class="content">Opens a history popup menu showing the next selected items.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/useShortNames.png"></td>
+		<td class="name">Use local names</td>
+		<td class="content">When this option is enabled, items are represented with their local
+		name (e.g. <code>Vector</code>), otherwise their fully qualified name is
+		used, (e.g. <code>java.util.Vector</code>).</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/showAccessSymbols.png"></td>
+		<td class="name">Show UML symbols</td>
+		<td class="content">When this option is enabled, items declared <i>static</i>
+		are underlined and a symbol indicates items access specification
+		as follows:
+		<table>
+			<tr>
+				<td><img src="images/public.png"></td>
+				<td>if the item is declared &quot;public&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/protected.png"></td>
+				<td>if the item is declared &quot;protected&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/private.png"></td>
+				<td>if the item is declared &quot;private&quot;</td>
+			</tr>
+			<tr>
+				<td><img src="images/package.png"></td>
+				<td>if the item does not have an access specification, i.e. is
+				&quot;package protected&quot;</td>
+			</tr>
+		</table></td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/class.png"></td>
+		<td class="name">Show classes</td>
+		<td class="content">Enables visualization of classes.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/interface.png"></td>
+		<td class="name">Show interfaces</td>
+		<td class="content">Enables visualization of interfaces.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/nestedClass.png"></td>
+		<td class="name">Show nested elements</td>
+		<td class="content">Enables visualization of nested classes and inerfaces.</td>
+	</tr>
+	<tr>
+		<td class="header"></td>
+		<td class="name">Layout selector</td>
+		<td class="content">Use this combo box to choose a layout for classes and
+		interfaces. &quot;By Derivation&quot; groups objects according to their
+		derivation relationships, i.e. puts subclasses near to their
+		superclasses. &quot;By Implementation&quot; groups objects according to
+		the derivation relationships amongst interfaces and the implementation
+		relationships between interfaces and classes, i.e. puts subinterfaces
+		near to their superinterfaces and classes near to the interfaces they
+		implement. &quot;By Nesting&quot; groups objects according to their
+		nesting relationships, i.e. puts nested elements near to their enclosing
+		class or interface.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/selCenter.png"></td>
+		<td class="name">Centre diagram upon selected element</td>
+		<td class="content">Automatically centres the diagram upon the selected
+		class or interface.
+		</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/selApplyFilter.png"></td>
+		<td class="name">Show only selected element relatives</td>
+		<td class="content">If a selection exists, hides all the classes and
+		interfaces that do not conform to the requisites chosen with the
+		<i>Relatives selector</i>.</td>
+	</tr>
+	<tr>
+		<td class="header"></td>
+		<td class="name">Relatives selector</td>
+		<td class="content">Use this combo box to choose which relatives must be
+		shown for the selected class or interface. For a class, <i>Ancestors</i>
+		shows all superclasses and implemented interfaces while
+		<i>Descendants</i> shows all subclasses. For an interface,
+		<i>Ancestors</i> shows all superinterfaces, while <i>Descendants</i>
+		shows all subinterfaces and implementors. <i>All</i> is the sum of the
+		<i>Ancestors</i> and <i>Descendants</i> options.
+		The selector is only available when the
+		<i>Show only selected element relatives</i> is active and there is
+		a selection.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/connShowRelevantOnly.png"></td>
+		<td class="name">Show only layout-relevant relationships</td>
+		<td class="content">This option affects the visibility of the lines
+		representing the relationships between classes and interfaces. If the
+		current layout is <i>By Derivation</i>, only the derivation and
+		implementation connections are shown. If the current layout is
+		<i>By Implementation</i>, only the implementation connections are
+		shown. If the current layout is <i>By Nesting</i>, only the nesting
+		connections are shown.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/connShowDerivation.png"></td>
+		<td class="name">Show derivation relationships</td>
+		<td class="content">Shows or hides the lines representing the derivation
+		relationships between classes or interfaces. If the
+		<i>Show only layout-relevant relationships</i> option is enabled,
+		this option in not available.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/connShowImplementation.png"></td>
+		<td class="name">Show implementation relationships</td>
+		<td class="content">Shows or hides the lines representing the
+		implementation relationships between classes and interfaces. If the
+		<i>Show only layout-relevant relationships</i> option is enabled,
+		this option in not available.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/connShowNesting.png"></td>
+		<td class="name">Show nesting relationships</td>
+		<td class="content">Shows or hides the lines representing the nesting
+		relationships between classes and interfaces. If the
+		<i>Show only layout-relevant relationships</i> option is enabled,
+		this option in not available.</td>
+	</tr>
+	<tr>
+		<td class="header"><img src="images/buttons/colorizePackages.png"></td>
+		<td class="name">Show package colors</td>
+		<td class="content">When this option is enabled, the background of classes
+		and interfaces is coloured according to the
+		<a href=#PackageColors>Package-color definitions</a>.
+		</td>
+	</tr>
+</table>
+<!-- }}} -->
+
+<!-- {{{ Code navigation -->
+<h4><a name="Code_navigation">Code navigation</a></h4>
+<p>The effect of selecting an item in the Index or in the Graph window is to
+open the file containing the item in a new jEdit buffer (or to just make the
+buffer current if the file is already open) and jump to the item definition,
+which gets selected.</p>
+
+<p>It is also possible to go back up to an item from code, using the
+<b>Plugins&gt;JExplorer&gt;Select Item at Cursor</b> and the
+<b>Plugins&gt;JExplorer&gt;Select Item at Cursor (pos. source)</b> commands.
+Both versions determine the item from the current cursor position. The
+second version is completely equivalent to selecting an item into one of the
+JExplorer windows, while the first leaves the current buffer selection and caret
+position unchanged.</p>
+<!-- }}} -->
+
+<!-- {{{ Global options -->
+<h3><a name="Global_options">Global options</a></h3>
+The JExplorer panel in the jEdit global options consents to choose fonts and colors for
+the rendering of items.
+
+<ul>
+	<li>
+		<i>Fonts</i>
+		<ul>
+			<li>
+			<i>Standard Items</i><br>
+			This font is used for standard items representation.
+			</li>
+			<li>
+			<i>'abstract' Items</i><br>
+			This font is used to represent items declared &quot;abstract&quot;.
+			</li>
+			<li>
+			<i>'final' Items</i><br>
+			This font is used to represent items declared &quot;final&quot;.
+			</li>
+		</ul>
+	</li>
+	<li>
+		<i>Colors</i>
+		<ul>
+			<li>
+			<i>Classes &amp; Derivation</i><br>
+			This color is used to represent classes and derivation relationships
+			between classes.
+			</li>
+			<li>
+			<i>Interfaces &amp; Implementation</i><br>
+			This color is used to represent interfaces, derivation relationships
+			between interfaces and implementation relationships between classes
+			and interfaces.
+			</li>
+			<li>
+			<i>Nesting</i><br>
+			This color is used to represent nesting relationships between classes
+			and interfaces.
+			</li>
+			<li>
+			<i>Fields</i><br>
+			This color is used to represent fields.
+			</li>
+			<li>
+			<i>Constructors</i><br>
+			This color is used to represent constructors.
+			</li>
+			<li>
+			<i>Methods</i><br>
+			This color is used to represent methods.
+			</li>
+		</ul>
+	</li>
+	<li>
+		<i>Models</i>
+		<ul>
+			<li>
+			<i>Rebuilding delay</i><br>
+			This is the delay (in seconds) that elapses between the last keystroke
+			and the automatic rebuilding of models. It only applies when the
+			&quot;When buffers change&quot; option in a model &quot;Properties&quot;
+			dialog is checked.
+			</li>
+		</ul>
+	</li>
+</ul>
+<!-- }}} -->
+
+<!-- {{{ Known bugs -->
+<h3><a name="Known_bugs">Known bugs</a></h3>
+<p>Recognition of the &quot;assert&quot; keyword introduced by Java 1.4 cannot be
+disabled, so pre-1.4 code that legally uses it cannot be parsed without errors,
+e.g. the java.awt package.</p>
+
+<p>Currently, the ProjectViewer plugin does not send events about project renaming.
+Therefore this situation cannot correctly be handled by JExplorer.</p>
+<!-- }}} -->
+
+</body>
+</html>

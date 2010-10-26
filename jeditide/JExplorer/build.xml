@@ -1,0 +1,69 @@
+<!-- :folding=explicit:collapseFolds=1: -->
+
+<project	name	= "JExplorer"
+			default	= "dist"
+			basedir	= ".">
+
+<!-- {{{ Properties -->
+<property file="build.properties"/>
+<property file="../build.properties"/>
+<property file="${user.home}/.build.properties"/>
+<property file="${user.home}/build.properties"/>
+
+<property name = "jedit.install.dir"	value = "../.."/>
+<property name = "jedit.plugins.dir"	value = ".."/>
+<property name = "jar.name"				value = "${ant.project.name}.jar"/>
+<property name = "src.dir"				value = "."/>
+<property name = "build.dir"			value = "build"/>
+<property name = "install.dir"			value = ".."/>
+<!-- }}} -->
+
+<!-- {{{ Paths -->
+<path id = "project.class.path">
+	<pathelement location = "${jedit.install.dir}/jedit.jar"/>
+	<pathelement location = "${jedit.plugins.dir}/ProjectViewer.jar"/>
+	<pathelement location = "${jedit.plugins.dir}/ErrorList.jar"/>
+	<pathelement location = "."/>
+</path>
+<!-- }}} -->
+
+<!-- {{{ Targets -->
+
+<!-- {{{ 'clean' target -->
+<target	name	= "clean">
+	<delete dir	= "${build.dir}"/>
+</target>
+<!-- }}} -->
+
+<!-- {{{ 'compile' target -->
+<target	name	= "compile">
+
+	<mkdir dir	= "${build.dir}"/>
+	<javac	srcdir			= "${src.dir}"
+			destdir			= "${build.dir}"
+			classpathref	= "project.class.path"
+			deprecation		= "on"/>
+</target>
+<!-- }}} -->
+
+<!-- {{{ 'dist' target -->
+<target	name	= "dist"
+		depends	= "compile">
+	<mkdir dir = "${install.dir}"/>
+	<jar jarfile = "${install.dir}/${jar.name}">
+		<fileset dir = "${build.dir}"/>
+		<fileset dir = "${src.dir}">
+			<include name = "JExplorerPlugin.props"/>
+			<include name = "images/*.png"/>
+			<include name = "images/buttons/*.png"/>
+			<include name = "actions.xml"/>
+			<include name = "dockables.xml"/>
+			<include name = "*.html"/>
+			<include name = "*.css"/>
+		</fileset>
+	</jar>
+</target>
+<!-- }}} -->
+
+<!-- }}} -->
+</project>

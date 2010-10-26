@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<!-- Action definition file for JExplorer plugin -->
+
+<!DOCTYPE ACTIONS SYSTEM "actions.dtd">
+
+<ACTIONS>
+
+	<ACTION NAME="jexplorer-editModels">
+		<CODE>
+			jexplorer.model.ModelManager.getInstance().openModelManagerDialog();
+		</CODE>
+	</ACTION>
+
+	<ACTION NAME="jexplorer-selAtCursor">
+		<CODE>
+			jexplorer.model.ModelManager.getInstance().selectObjectAtCursor(view, false);
+		</CODE>
+	</ACTION>
+
+	<ACTION NAME="jexplorer-selAtCursorSrcPos">
+		<CODE>
+			jexplorer.model.ModelManager.getInstance().selectObjectAtCursor(view, true);
+		</CODE>
+	</ACTION>
+
+</ACTIONS>
+

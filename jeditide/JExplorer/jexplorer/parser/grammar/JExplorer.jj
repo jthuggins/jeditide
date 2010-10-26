@@ -1,0 +1,1803 @@
+/*
+ * JExplorer.jj
+ *
+ * This grammar is based on the Java1.1.jj grammar found in the JavaCC
+ * distribution, written by Sriram Sankar and Copyright (C) 1996, 1997
+ * Sun Microsystems Inc.
+ *
+ * Adaptation to Java 1.2 by David Williams (support for the "strictfp"
+ * keyword) and Marco Savard (".super" construct).
+ *
+ * Adaptation to Java 1.4 by Andrea Gini (support for the "assert" keyword).
+ *
+ * All other modifications are Copyright (C) 2003 Amedeo Farello.
+ *
+ * IMPORTANT NOTICE:
+ *
+ * If for some reason the file 'JavaCharStream.java' has to be regenerated
+ * by JavaCC, it must be modified to exclude tab characters expansion.
+ * To do this, simply comment out the two lines (236-237) in case '\t' of
+ * the switch construct of method UpdateLineColumn().
+ *
+ * If for some reason the file 'TokenMgrError.java' has to be regenerated
+ * by JavaCC, it must be modified to save and report the line where error
+ * occurred. To do this, add the following code to the class:
+ *
+ * at lines (36-37):
+ *	int errorLine;
+ *	public int getErrorLine() { return errorLine; }
+ *
+ * and add the following line (135):
+ *	this.errorLine = errorLine;
+ *
+ * to the constructor:
+ *	TokenMgrError(boolean, int, int, int, String, char, int)
+ */
+
+options
+	{
+	JAVA_UNICODE_ESCAPE = true;
+	STATIC = true;	// use only a single parser instance
+//	DEBUG_PARSER = true;
+	}
+
+PARSER_BEGIN(JavaParser)
+
+package jexplorer.parser;
+
+import java.util.Stack;
+import java.util.List;
+import java.util.LinkedList;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+
+import java.lang.reflect.Modifier;
+
+import jexplorer.parser.grammar.JExplorerParseException;
+
+import jexplorer.parser.source.JSource;
+import jexplorer.parser.source.Comment;
+import jexplorer.parser.source.SourcePos;
+import jexplorer.parser.source.JElement;
+import jexplorer.parser.source.JClass;
+import jexplorer.parser.source.JInterface;
+import jexplorer.parser.source.JField;
+import jexplorer.parser.source.JConstructor;
+import jexplorer.parser.source.JMethod;
+import jexplorer.parser.source.JParameter;
+import jexplorer.parser.source.JMember;
+import jexplorer.parser.source.JType;
+import jexplorer.parser.source.JDimType;
+/*------------------------------------------------------------------------------------------------------------------------------------
+	JavaParser
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Implements a Java language parser.
+ *
+ * @author	Amedeo Farello
+ * @version	0.2, 2003.05.09
+ */
+public class JavaParser
+{
+private final static String JAVA_LANG_OBJECT = "java.lang.Object";
+
+static JavaParser	s_ParserInstance	= null;
+static Stack		s_ScopeStack		= new Stack();
+static JSource		s_Source			= null;
+static int			s_Modifiers			= 0;
+static Token		s_CommentToken		= null;
+static Token		s_ItemStartToken	= null;
+/*------------------------------------------------------------------------------------------------------------------------------------
+	closeInputStream
+------------------------------------------------------------------------------------------------------------------------------------*/
+private static void		closeInputStream(InputStream inInputStream)
+{
+if(inInputStream != null)
+	{
+	try						{ inInputStream.close(); }
+	catch(IOException ioe)	{ /* nothing we can do */ }
+	}
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	parse
+------------------------------------------------------------------------------------------------------------------------------------*/
+synchronized public static void	parse(	JSource		inOutputSource,
+										InputStream	inInputStream)
+	throws TokenMgrError, ParseException, JExplorerParseException
+{
+s_Source = inOutputSource;
+
+// signal this source has been parsed
+s_Source.setParsed(true);
+
+// add implicit type-import-on-demand for the java.lang package
+s_Source.addTypeImportOnDemand("java.lang");
+
+// clear the scope stack, could not be empty if previous parse ended abnormally
+s_ScopeStack.clear();
+
+try
+	{
+	// setup the parser
+	if(s_ParserInstance == null)	s_ParserInstance = new JavaParser(inInputStream);
+	else							s_ParserInstance.ReInit(inInputStream);
+
+	// parse the input file
+	s_ParserInstance.CompilationUnit();
+	}
+catch(TokenMgrError tme)				// catch lexical errors
+	{
+	closeInputStream(inInputStream);	// close the stream!
+	s_Source.setValid(false);			// source is not valid!
+	throw(tme);
+	}
+catch(ParseException pe)				// catch syntax errors
+	{
+	closeInputStream(inInputStream);	// close the stream!
+	s_Source.setValid(false);			// source is not valid!
+	throw(pe);
+	}
+catch(Throwable t)						// catch anything else
+	{
+	closeInputStream(inInputStream);	// close the stream!
+	s_Source.setValid(false);			// source is not valid!
+	JExplorerParseException	jpe = new JExplorerParseException(t, token);
+	throw(jpe);
+	}
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	addModifier
+------------------------------------------------------------------------------------------------------------------------------------*/
+private static void	addModifier(int inModifier)
+{
+s_Modifiers = s_Modifiers | inModifier;
+
+// remember the beginning of the item definition
+if(s_ItemStartToken == null)
+	s_ItemStartToken = token;
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	clearInitialization
+------------------------------------------------------------------------------------------------------------------------------------*/
+private static void	clearInitialization()
+{
+s_Modifiers			= 0;
+s_ItemStartToken	= null;
+s_CommentToken		= null;
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createClass
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates a class descriptor.
+ * We record only member classes, not local classes, see JLS 2.0 14.3.
+ */
+private static JClass		createClass(Token	inName,
+										String	inSuperClass,
+										JType[]	inInterfaces)
+{
+JClass	theClass;
+
+if(!s_ScopeStack.empty())	// it's a nested class
+	{
+	if(s_ScopeStack.peek() instanceof JElement)	// it's a member class
+		{
+		JElement	je = (JElement)s_ScopeStack.peek();
+
+		theClass = new JClass(
+			je.getQualifiedName() + "." + inName.toString(),
+			s_Modifiers,
+			(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+			new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+			je,
+			new JType(inSuperClass),
+			inInterfaces);
+
+		((JElement)s_ScopeStack.peek()).addElement(theClass);
+		}
+	else										// it's a local class
+		{
+		JMember		jm = (JMember)s_ScopeStack.peek();
+
+		theClass = new JClass(
+			"<local>." + inName.toString(),
+			s_Modifiers,
+			(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+			new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+			null,
+			new JType(inSuperClass),
+			inInterfaces);
+		}
+	}
+else						// it's a top-level class
+	{
+	// since we assign a java.lang.Object superclass to all classes by default,
+	// we need to intercept the very special case when the java.lang.Object
+	// class is parsed and clear its superclass
+
+	String	qualifiedName = s_Source.getPackage() + "." + inName.toString();
+
+	if(qualifiedName.equals(JAVA_LANG_OBJECT))
+		inSuperClass = "";
+
+	theClass = new JClass(
+		qualifiedName,
+		s_Modifiers,
+		(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+		new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+		null,
+		new JType(inSuperClass),
+		inInterfaces);
+
+	s_Source.addElement(theClass);
+	}
+
+theClass.setBlockStart(s_ItemStartToken);
+return(theClass);
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createInterface
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates an interface descriptor.
+ * We record only member interfaces, not local interfaces, see JLS 2.0 14.3.
+ */
+private static JInterface	createInterface(Token	inName,
+											JType[]	inSuperInterfaces)
+{
+JInterface	theInterface;
+
+if(!s_ScopeStack.empty())	// it's a nested interface
+	{
+	if(s_ScopeStack.peek() instanceof JElement)	// it's a member interface
+		{
+		JElement	je = (JElement)s_ScopeStack.peek();
+
+		theInterface = new JInterface(
+			je.getQualifiedName() + "." + inName.toString(),
+			s_Modifiers,
+			(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+			new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+			je,
+			inSuperInterfaces);
+
+		((JElement)s_ScopeStack.peek()).addElement(theInterface);
+		}
+	else										// it's a local interface
+		{
+		JMember		jm = (JMember)s_ScopeStack.peek();
+
+		theInterface = new JInterface(
+			"<local>." + inName.toString(),
+			s_Modifiers,
+			(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+			new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+			null,
+			inSuperInterfaces);
+		}
+	}
+else						// it's a top-level interface
+	{
+	theInterface = new JInterface(
+		s_Source.getPackage() + "." + inName.toString(),
+		s_Modifiers,
+		(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+		new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+		null,
+		inSuperInterfaces);
+
+	s_Source.addElement(theInterface);
+	}
+
+theInterface.setBlockStart(s_ItemStartToken);
+return(theInterface);
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createParameter
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates a parameter descriptor.
+ */
+private static JParameter	createParameter(Token	inName,
+											String	inType,
+											boolean	inIsFinal)
+{
+StringBuffer	dimBuf = null;
+
+// extract dimension from type
+while(inType.endsWith("[]"))
+	{
+	inType = inType.substring(0, inType.length() - 2);
+	if(dimBuf == null)	dimBuf = new StringBuffer();
+	dimBuf.append("[]");
+	}
+
+// extract dimension from name
+while(inName.image.endsWith("[]"))
+	{
+	inName.image = inName.image.substring(0, inName.image.length() - 2);
+	if(dimBuf == null)	dimBuf = new StringBuffer();
+	dimBuf.append("[]");
+	}
+
+return(new JParameter(
+			inName.image,
+			new JDimType(inType, (dimBuf != null ? dimBuf.toString() : null)),
+			inIsFinal));
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createField
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates a field descriptor.
+ */
+private static JField		createField(Token	inName,
+										String	inType,
+										Token	inEndToken)
+{
+StringBuffer	dimBuf = null;
+
+// extract dimension from type
+while(inType.endsWith("[]"))
+	{
+	inType = inType.substring(0, inType.length() - 2);
+	if(dimBuf == null)	dimBuf = new StringBuffer();
+	dimBuf.append("[]");
+	}
+
+// extract dimension from name
+while(inName.image.endsWith("[]"))
+	{
+	inName.image = inName.image.substring(0, inName.image.length() - 2);
+	if(dimBuf == null)	dimBuf = new StringBuffer();
+	dimBuf.append("[]");
+	}
+
+JField	theField;
+
+if(s_ScopeStack.peek() instanceof JElement)	// belongs to a named class
+	{
+	theField = new JField(
+				inName.image,
+				s_Modifiers,
+				(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+				new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+				(JElement)s_ScopeStack.peek(),
+				new JDimType(inType, (dimBuf != null ? dimBuf.toString() : null)));
+
+	((JElement)s_ScopeStack.peek()).addField(theField);
+	}
+else	// belongs to an anonymous class
+	{
+	theField = new JField(
+				inName.image,
+				s_Modifiers,
+				(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+				new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+				null,
+				new JDimType(inType, (dimBuf != null ? dimBuf.toString() : null)));
+	}
+
+theField.setBlockEnd(inEndToken);
+return(theField);
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createConstructor
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates a constructor descriptor.
+ */
+private static JConstructor	createConstructor(	Token			inName,
+												JParameter[]	inParameters,
+												JType[]			inThrowables)
+{
+JConstructor	theConstructor = new JConstructor(
+						inName.image,
+						s_Modifiers,
+						(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+						new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+						(JElement)s_ScopeStack.peek(),
+						inParameters,
+						inThrowables);
+
+((JElement)s_ScopeStack.peek()).addConstructor(theConstructor);
+
+theConstructor.setBlockStart(s_ItemStartToken);
+return(theConstructor);
+}
+/*------------------------------------------------------------------------------------------------------------------------------------
+	createMethod
+------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Creates a method descriptor.
+ * We don't record methods belonging to anonymous classes, see JLS 2.0 15.9.5.
+ */
+private static JMethod		createMethod(	Token			inName,
+											JParameter[]	inParameters,
+											JType[]			inThrowables,
+											String			inReturnType)
+{
+StringBuffer	dimBuf = null;
+
+// extract dimension from return type
+while(inReturnType.endsWith("[]"))
+	{
+	inReturnType = inReturnType.substring(0, inReturnType.length() - 2);
+	if(dimBuf == null)	dimBuf = new StringBuffer();
+	dimBuf.append("[]");
+	}
+
+JMethod		theMethod;
+
+if(s_ScopeStack.peek() instanceof JElement)	// belongs to a named class
+	{
+	theMethod = new JMethod(
+				inName.image,
+				s_Modifiers,
+				(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+				new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+				(JElement)s_ScopeStack.peek(),
+				inParameters,
+				inThrowables,
+				new JDimType(inReturnType, (dimBuf != null ? dimBuf.toString() : null)));
+
+	((JElement)s_ScopeStack.peek()).addMethod(theMethod);
+	}
+else	// belongs to an anonymous class
+	{
+	theMethod = new JMethod(
+				inName.image,
+				s_Modifiers,
+				(s_CommentToken != null ? new Comment(s_CommentToken) : null),
+				new SourcePos(s_Source.getFile().getAbsolutePath(), inName),
+				null,
+				inParameters,
+				inThrowables,
+				new JDimType(inReturnType, (dimBuf != null ? dimBuf.toString() : null)));
+	}
+
+theMethod.setBlockStart(s_ItemStartToken);
+return(theMethod);
+}
+}
+
+PARSER_END(JavaParser)
+
+/*--------------------------------------------------------------
+	Lexical analyzer definitions
+--------------------------------------------------------------*/
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+/* COMMENTS */
+
+MORE :
+{
+  "//" : IN_SINGLE_LINE_COMMENT
+|
+  <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+|
+  "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT>
+SKIP :
+{
+// this is modified to accept files ending with a single-line
+// comment not followed by a newline (thanks Theodore Norvell)
+// this is illegal, but normally accepted by JDK compilers 
+  <SINGLE_LINE_COMMENT: (~["\n","\r"])* ("\n"|"\r"|"\r\n")? >
+	: DEFAULT
+}
+
+<IN_FORMAL_COMMENT>
+SPECIAL_TOKEN :
+{
+  <FORMAL_COMMENT: "*/" >
+	{
+	// cache the Javadoc comment
+	JavaParser.s_CommentToken = matchedToken;
+	}
+  	: DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT>
+SKIP :
+{
+  <MULTI_LINE_COMMENT: "*/" >
+	: DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT,IN_FORMAL_COMMENT,IN_MULTI_LINE_COMMENT>
+MORE :
+{
+  < ~[] >
+}
+
+/* RESERVED WORDS AND LITERALS */
+
+TOKEN :
+{
+  < ABSTRACT: "abstract" >
+| < ASSERT: "assert" >
+| < BOOLEAN: "boolean" >
+| < BREAK: "break" >
+| < BYTE: "byte" >
+| < CASE: "case" >
+| < CATCH: "catch" >
+| < CHAR: "char" >
+| < CLASS: "class" >
+| < CONST: "const" >
+| < CONTINUE: "continue" >
+| < _DEFAULT: "default" >
+| < DO: "do" >
+| < DOUBLE: "double" >
+| < ELSE: "else" >
+| < EXTENDS: "extends" >
+| < FALSE: "false" >
+| < FINAL: "final" >
+| < FINALLY: "finally" >
+| < FLOAT: "float" >
+| < FOR: "for" >
+| < GOTO: "goto" >
+| < IF: "if" >
+| < IMPLEMENTS: "implements" >
+| < IMPORT: "import" >
+| < INSTANCEOF: "instanceof" >
+| < INT: "int" >
+| < INTERFACE: "interface" >
+| < LONG: "long" >
+| < NATIVE: "native" >
+| < NEW: "new" >
+| < NULL: "null" >
+| < PACKAGE: "package">
+| < PRIVATE: "private" >
+| < PROTECTED: "protected" >
+| < PUBLIC: "public" >
+| < RETURN: "return" >
+| < SHORT: "short" >
+| < STATIC: "static" >
+| < STRICTFP: "strictfp" >
+| < SUPER: "super" >
+| < SWITCH: "switch" >
+| < SYNCHRONIZED: "synchronized" >
+| < THIS: "this" >
+| < THROW: "throw" >
+| < THROWS: "throws" >
+| < TRANSIENT: "transient" >
+| < TRUE: "true" >
+| < TRY: "try" >
+| < VOID: "void" >
+| < VOLATILE: "volatile" >
+| < WHILE: "while" >
+}
+
+/* LITERALS */
+
+TOKEN :
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+|
+  < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+  >
+|
+  < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|
+  < CHARACTER_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )
+      "'"
+  >
+|
+  < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+}
+
+/* IDENTIFIERS */
+
+TOKEN :
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+  >
+}
+
+/* SEPARATORS */
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < LBRACKET: "[" >
+| < RBRACKET: "]" >
+| < SEMICOLON: ";" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+/* OPERATORS */
+
+TOKEN :
+{
+  < ASSIGN: "=" >
+| < GT: ">" >
+| < LT: "<" >
+| < BANG: "!" >
+| < TILDE: "~" >
+| < HOOK: "?" >
+| < COLON: ":" >
+| < EQ: "==" >
+| < LE: "<=" >
+| < GE: ">=" >
+| < NE: "!=" >
+| < SC_OR: "||" >
+| < SC_AND: "&&" >
+| < INCR: "++" >
+| < DECR: "--" >
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < SLASH: "/" >
+| < BIT_AND: "&" >
+| < BIT_OR: "|" >
+| < XOR: "^" >
+| < REM: "%" >
+| < LSHIFT: "<<" >
+| < RSIGNEDSHIFT: ">>" >
+| < RUNSIGNEDSHIFT: ">>>" >
+| < PLUSASSIGN: "+=" >
+| < MINUSASSIGN: "-=" >
+| < STARASSIGN: "*=" >
+| < SLASHASSIGN: "/=" >
+| < ANDASSIGN: "&=" >
+| < ORASSIGN: "|=" >
+| < XORASSIGN: "^=" >
+| < REMASSIGN: "%=" >
+| < LSHIFTASSIGN: "<<=" >
+| < RSIGNEDSHIFTASSIGN: ">>=" >
+| < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+}
+
+/*****************************************
+ * THE JAVA LANGUAGE GRAMMAR STARTS HERE *
+ *****************************************/
+
+/*--------------------------------------------------------------
+	Program structuring syntax follows
+--------------------------------------------------------------*/
+
+void CompilationUnit() :
+{}
+{
+  [ PackageDeclaration() ]
+  ( ImportDeclaration() )*
+  ( TypeDeclaration() )*
+  <EOF>
+}
+
+void PackageDeclaration() :
+{
+String	s;
+}
+{
+  "package"
+  s = Name()
+  ";"
+	{
+	s_Source.setPackage(s);
+	}
+}
+
+void ImportDeclaration() :
+{
+boolean	importOnDemand = false;
+String	s;
+}
+{
+  "import"
+  s = Name()
+  [
+  	"." "*"
+	{
+	importOnDemand = true;
+	}
+  ]
+  ";"
+	{
+	if(importOnDemand)
+		s_Source.addTypeImportOnDemand(s);
+	else
+		s_Source.addSingleTypeImport(s);
+	}
+}
+
+void TypeDeclaration() :
+{}
+{
+  LOOKAHEAD( ( "abstract" | "final" | "public" | "strictfp" )* "class" )
+  ClassDeclaration()
+|
+  InterfaceDeclaration()
+|
+  ";"
+}
+
+/*--------------------------------------------------------------
+	Declaration syntax follows
+--------------------------------------------------------------*/
+
+void ClassDeclaration() :
+{}
+{
+  (  "abstract"	{ addModifier(Modifier.ABSTRACT); }
+   | "final"	{ addModifier(Modifier.FINAL); }
+   | "public"	{ addModifier(Modifier.PUBLIC); }
+   | "strictfp"	{ addModifier(Modifier.STRICT); }
+  )*
+  UnmodifiedClassDeclaration()
+}
+
+void UnmodifiedClassDeclaration() :
+{
+Token		t;
+JClass		theClass;
+String		theSuperclass = JAVA_LANG_OBJECT;
+JType[]		theInterfaces = null;
+}
+{
+  "class"
+  	{
+	addModifier(0);	// mark beginning of class block, if there was no modifier
+	}
+  t = <IDENTIFIER>
+  [ "extends" theSuperclass = Name() ]
+  [ "implements" theInterfaces = NameList() ]
+  	{
+	theClass = createClass(t, theSuperclass, theInterfaces);
+	clearInitialization();
+	s_ScopeStack.push(theClass);
+	}
+  ClassBody()
+	{
+	theClass.setBlockEnd(token);
+	s_ScopeStack.pop();
+	}
+}
+
+void ClassBody() :
+{}
+{
+  "{" ( ClassBodyDeclaration() )* "}"
+}
+
+void NestedClassDeclaration() :
+{}
+{
+  (	  "static"		{ addModifier(Modifier.STATIC); }
+	| "abstract"	{ addModifier(Modifier.ABSTRACT); }
+	| "final"		{ addModifier(Modifier.FINAL); }
+	| "public"		{ addModifier(Modifier.PUBLIC); }
+	| "protected"	{ addModifier(Modifier.PROTECTED); }
+	| "private"		{ addModifier(Modifier.PRIVATE); }
+	| "strictfp"	{ addModifier(Modifier.STRICT); }
+  )*
+  UnmodifiedClassDeclaration()
+}
+
+void ClassBodyDeclaration() :
+{}
+{
+  LOOKAHEAD(2)
+  Initializer()
+|
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "class" )
+  NestedClassDeclaration()
+|
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "interface" )
+  NestedInterfaceDeclaration()
+|
+  LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
+  ConstructorDeclaration()
+|
+  LOOKAHEAD( MethodDeclarationLookahead() )
+  MethodDeclaration()
+|
+  FieldDeclaration()
+|
+// avoid refusing semicolons after the closing brace;
+// this is illegal, but normally accepted by JDK compilers 
+  ";"
+}
+
+// This production is to determine lookahead only.
+void MethodDeclarationLookahead() :
+{}
+{
+  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp" )*
+  ResultType() <IDENTIFIER> "("
+}
+
+void InterfaceDeclaration() :
+{}
+{
+  (   "abstract"	{ addModifier(Modifier.ABSTRACT); }
+	| "public"		{ addModifier(Modifier.PUBLIC); }
+	| "strictfp"	{ addModifier(Modifier.STRICT); }
+  )*
+  UnmodifiedInterfaceDeclaration()
+}
+
+void NestedInterfaceDeclaration() :
+{}
+{
+  (   "static"		{ addModifier(Modifier.STATIC); }
+	| "abstract"	{ addModifier(Modifier.ABSTRACT); }
+	| "final"		{ addModifier(Modifier.FINAL); }
+	| "public"		{ addModifier(Modifier.PUBLIC); }
+	| "protected"	{ addModifier(Modifier.PROTECTED); }
+	| "private"		{ addModifier(Modifier.PRIVATE); }
+	| "strictfp"	{ addModifier(Modifier.STRICT); }
+  )*
+  UnmodifiedInterfaceDeclaration()
+}
+
+void UnmodifiedInterfaceDeclaration() :
+{
+Token		t;
+JInterface	theInterface;
+JType[]		theSuperInterfaces = null;
+}
+{
+  "interface"
+  	{
+	addModifier(0);	// mark beginning of interface block, if there was no modifier
+	}
+  t = <IDENTIFIER>
+  [ "extends" theSuperInterfaces = NameList() ]
+  	{
+	theInterface = createInterface(t, theSuperInterfaces);
+	clearInitialization();
+	s_ScopeStack.push(theInterface);
+	}
+  "{" ( InterfaceMemberDeclaration() )* "}"
+	{
+	theInterface.setBlockEnd(token);
+	s_ScopeStack.pop();
+	}
+}
+
+void InterfaceMemberDeclaration() :
+{}
+{
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "class" )
+  NestedClassDeclaration()
+|
+  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" )* "interface" )
+  NestedInterfaceDeclaration()
+|
+  LOOKAHEAD( MethodDeclarationLookahead() )
+  MethodDeclaration()
+|
+  FieldDeclaration()
+|
+// avoid refusing semicolons after the closing brace;
+// this is illegal, but normally accepted by JDK compilers 
+  ";"
+}
+
+void FieldDeclaration() :
+{
+Token	t;
+String	type;
+JField	theField;
+}
+{
+  (   "public"		{ addModifier(Modifier.PUBLIC); }
+	| "protected"	{ addModifier(Modifier.PROTECTED); }
+	| "private"		{ addModifier(Modifier.PRIVATE); }
+	| "static"		{ addModifier(Modifier.STATIC); }
+	| "final"		{ addModifier(Modifier.FINAL); }
+	| "transient"	{ addModifier(Modifier.TRANSIENT); }
+	| "volatile"	{ addModifier(Modifier.VOLATILE); }
+  )*
+  type = Type()
+  t = VariableDeclarator()
+	{
+	// token points to the end of VariableDeclarator()
+	theField = createField(t, type, token);
+	}
+  ( "," t = VariableDeclarator()
+	{
+	// token points to the end of VariableDeclarator()
+	theField = createField(t, type, token);
+	}
+  )*
+  ";"
+	{
+	clearInitialization();
+	}
+}
+
+Token VariableDeclarator() :
+{
+Token t;
+}
+{
+  t = VariableDeclaratorId()
+  [ "=" VariableInitializer() ]
+	{
+	return(t);
+	}
+}
+
+Token VariableDeclaratorId() :
+{
+Token t;
+}
+{
+  t = <IDENTIFIER>
+  (
+	"[" "]"
+	{
+	t.image += "[]";
+	}
+  )*
+	{
+	return(t);
+	}
+}
+
+void VariableInitializer() :
+{}
+{
+  ArrayInitializer()
+|
+  Expression()
+}
+
+void ArrayInitializer() :
+{}
+{
+  "{" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] [ "," ] "}"
+}
+
+void MethodDeclaration() :
+{
+Token			t;
+JMethod			theMethod;
+JParameter[]	theParameters = null;
+JType[]			theThrowables = null;
+String			rtype;
+}
+{
+  (   "public"			{ addModifier(Modifier.PUBLIC); }
+	| "protected"		{ addModifier(Modifier.PROTECTED); }
+	| "private"			{ addModifier(Modifier.PRIVATE); }
+	| "static"			{ addModifier(Modifier.STATIC); }
+	| "abstract"		{ addModifier(Modifier.ABSTRACT); }
+	| "final"			{ addModifier(Modifier.FINAL); }
+	| "native"			{ addModifier(Modifier.NATIVE); }
+	| "synchronized"	{ addModifier(Modifier.SYNCHRONIZED); }
+	| "strictfp"		{ addModifier(Modifier.STRICT); }
+  )*
+  rtype = ResultType()
+  	{
+	addModifier(0);	// mark beginning of method block, if there was no modifier
+	}
+  // Farello: don't see why a separated MethodDeclarator() should be used
+  // MethodDeclarator()
+  t = <IDENTIFIER>
+  theParameters = FormalParameters()
+  ( "[" "]" )*
+  [ "throws" theThrowables = NameList() ]
+	{
+	theMethod = createMethod(t, theParameters, theThrowables, rtype);
+	clearInitialization();
+	s_ScopeStack.push(theMethod);
+	}
+  ( Block() | ";" )
+	{
+	theMethod.setBlockEnd(token);
+	s_ScopeStack.pop();
+	}
+}
+
+// Farello: this is not used
+void MethodDeclarator() :
+{}
+{
+  <IDENTIFIER>
+  FormalParameters()
+  ( "[" "]" )*
+}
+
+JParameter[] FormalParameters() :
+{
+JParameter	p;
+List		list = new LinkedList();
+}
+{
+  "("
+  [
+  p = FormalParameter()
+	{
+	list.add(p);
+	}
+  ( "," p = FormalParameter()
+	{
+	list.add(p);
+	}
+  )*
+  ]
+  ")"
+	{
+	return((JParameter[])list.toArray(new JParameter[list.size()]));
+	}
+}
+
+JParameter FormalParameter() :
+{
+boolean	isFinal = false;
+String	type;
+Token	name;
+}
+{
+  [ "final" ]
+	{
+	isFinal = true;
+	}
+  type = Type()
+  name = VariableDeclaratorId()
+	{
+	return(createParameter(name, type, isFinal));
+	}
+}
+
+void ConstructorDeclaration() :
+{
+Token			t;
+JConstructor	theConstructor;
+JParameter[]	theParameters = null;
+JType[]			theThrowables = null;
+}
+{
+  [   "public"		{ addModifier(Modifier.PUBLIC); }
+	| "protected"	{ addModifier(Modifier.PROTECTED); }
+	| "private"		{ addModifier(Modifier.PRIVATE); }
+  ]
+  	{
+	addModifier(0);	// mark beginning of constructor block, if there was no modifier
+	}
+  t = <IDENTIFIER>
+  theParameters = FormalParameters()
+  [ "throws" theThrowables = NameList() ]
+	{
+	theConstructor = createConstructor(t, theParameters, theThrowables);
+	clearInitialization();
+	s_ScopeStack.push(theConstructor);
+	}
+  "{"
+    [ LOOKAHEAD(ExplicitConstructorInvocation()) ExplicitConstructorInvocation() ]
+    ( BlockStatement() )*
+  "}"
+	{
+	theConstructor.setBlockEnd(token);
+	s_ScopeStack.pop();
+	}
+}
+
+void ExplicitConstructorInvocation() :
+{}
+{
+  LOOKAHEAD("this" Arguments() ";")
+  "this" Arguments() ";"
+|
+  [ LOOKAHEAD(2) PrimaryExpression() "." ] "super" Arguments() ";"
+}
+
+void Initializer() :
+{}
+{
+  [ "static" ] Block()
+}
+
+/*--------------------------------------------------------------
+	Type and Name syntax follows
+--------------------------------------------------------------*/
+
+String Type() :
+{
+String	s;
+}
+{
+  (
+	  s = PrimitiveType()
+	| s = Name()
+  )
+  (
+	"[" "]"
+	{
+	s += "[]";
+	}
+  )*
+	{
+	return(s);
+	}
+}
+
+String PrimitiveType() :
+{}
+{
+  (
+	  "boolean"
+	| "char"
+	| "byte"
+	| "short"
+	| "int"
+	| "long"
+	| "float"
+	| "double"
+  )
+	{
+	return(getToken(0).image);
+	}
+}
+
+String ResultType() :
+{
+String	s;
+}
+{
+  (
+  "void"
+	{
+	s = "void";
+	}
+  |
+  s = Type()
+  )
+	{
+	return(s);
+	}
+}
+
+String Name() :
+/*
+ * A lookahead of 2 is required below since "Name" can be followed
+ * by a ".*" when used in the context of an "ImportDeclaration".
+ */
+{
+Token	t;
+String	s;
+}
+{
+ (
+  t = <IDENTIFIER>
+	{
+	s = t.image;
+	}
+  ( LOOKAHEAD(2)
+	"."
+	t = <IDENTIFIER>
+		{
+		s += "." + t.image;
+		}
+  )*
+ )
+	{
+	return(s);
+	}
+}
+
+JType[] NameList() :
+{
+String	s;
+List	list = new LinkedList();
+}
+{
+  s = Name()
+  	{
+	list.add(new JType(s));
+	}
+  ( "," s = Name()
+  	{
+	list.add(new JType(s));
+	}
+  )*
+	{
+	return((JType[])list.toArray(new JType[list.size()]));
+	}
+}
+
+/*--------------------------------------------------------------
+	Expression syntax follows
+--------------------------------------------------------------*/
+
+void Expression() :
+/*
+ * This expansion has been written this way instead of:
+ *   Assignment() | ConditionalExpression()
+ * for performance reasons.
+ * However, it is a weakening of the grammar for it allows the LHS of
+ * assignments to be any conditional expression whereas it can only be
+ * a primary expression.  Consider adding a semantic predicate to work
+ * around this.
+ */
+{}
+{
+  ConditionalExpression()
+  [
+    AssignmentOperator() Expression()
+  ]
+}
+
+void AssignmentOperator() :
+{}
+{
+  "=" | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
+}
+
+void ConditionalExpression() :
+{}
+{
+  ConditionalOrExpression() [ "?" Expression() ":" ConditionalExpression() ]
+}
+
+void ConditionalOrExpression() :
+{}
+{
+  ConditionalAndExpression() ( "||" ConditionalAndExpression() )*
+}
+
+void ConditionalAndExpression() :
+{}
+{
+  InclusiveOrExpression() ( "&&" InclusiveOrExpression() )*
+}
+
+void InclusiveOrExpression() :
+{}
+{
+  ExclusiveOrExpression() ( "|" ExclusiveOrExpression() )*
+}
+
+void ExclusiveOrExpression() :
+{}
+{
+  AndExpression() ( "^" AndExpression() )*
+}
+
+void AndExpression() :
+{}
+{
+  EqualityExpression() ( "&" EqualityExpression() )*
+}
+
+void EqualityExpression() :
+{}
+{
+  InstanceOfExpression() ( ( "==" | "!=" ) InstanceOfExpression() )*
+}
+
+void InstanceOfExpression() :
+{}
+{
+  RelationalExpression()
+  [ "instanceof" Type() ]
+}
+
+void RelationalExpression() :
+{}
+{
+  ShiftExpression() ( ( "<" | ">" | "<=" | ">=" ) ShiftExpression() )*
+}
+
+void ShiftExpression() :
+{}
+{
+  AdditiveExpression() ( ( "<<" | ">>" | ">>>" ) AdditiveExpression() )*
+}
+
+void AdditiveExpression() :
+{}
+{
+  MultiplicativeExpression() ( ( "+" | "-" ) MultiplicativeExpression() )*
+}
+
+void MultiplicativeExpression() :
+{}
+{
+  UnaryExpression() ( ( "*" | "/" | "%" ) UnaryExpression() )*
+}
+
+void UnaryExpression() :
+{}
+{
+  ( "+" | "-" ) UnaryExpression()
+|
+  PreIncrementExpression()
+|
+  PreDecrementExpression()
+|
+  UnaryExpressionNotPlusMinus()
+}
+
+void PreIncrementExpression() :
+{}
+{
+  "++" PrimaryExpression()
+}
+
+void PreDecrementExpression() :
+{}
+{
+  "--" PrimaryExpression()
+}
+
+void UnaryExpressionNotPlusMinus() :
+{}
+{
+  ( "~" | "!" ) UnaryExpression()
+|
+  LOOKAHEAD( CastLookahead() )
+  CastExpression()
+|
+  PostfixExpression()
+}
+
+// This production is to determine lookahead only.  The LOOKAHEAD specifications
+// below are not used, but they are there just to indicate that we know about
+// this.
+void CastLookahead() :
+{}
+{
+  LOOKAHEAD(2)
+  "(" PrimitiveType()
+|
+  LOOKAHEAD("(" Name() "[")
+  "(" Name() "[" "]"
+|
+  "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER> | "this" | "super" | "new" | Literal() )
+}
+
+void PostfixExpression() :
+{}
+{
+  PrimaryExpression() [ "++" | "--" ]
+}
+
+void CastExpression() :
+{}
+{
+  LOOKAHEAD("(" PrimitiveType())
+  "(" Type() ")" UnaryExpression()
+|
+  "(" Type() ")" UnaryExpressionNotPlusMinus()
+}
+
+void PrimaryExpression() :
+{}
+{
+  PrimaryPrefix() ( LOOKAHEAD(2) PrimarySuffix() )*
+}
+
+void PrimaryPrefix() :
+{}
+{
+  Literal()
+|
+  "this"
+|
+  "super" "." <IDENTIFIER>
+|
+  "(" Expression() ")"
+|
+  AllocationExpression()
+|
+  LOOKAHEAD( ResultType() "." "class" )
+  ResultType() "." "class"
+|
+  // look for a method invocation
+  LOOKAHEAD( Name() Arguments() )
+  Name()
+  Arguments()
+|
+  // look for a symbol invocation
+// KARMA
+  Name()
+}
+
+void PrimarySuffix() :
+{}
+{
+  LOOKAHEAD(2)
+  "." "this"
+|				// Marco Savard
+  LOOKAHEAD(2)	// Marco Savard
+  "." "super"	// Marco Savard
+|
+  LOOKAHEAD(2)
+  "." AllocationExpression()
+|
+  "[" Expression() "]"
+|
+  LOOKAHEAD(3)
+  "."
+  <IDENTIFIER>
+  Arguments()
+|
+  "."
+  <IDENTIFIER>
+|
+  Arguments()
+}
+
+void Literal() :
+{}
+{
+  <INTEGER_LITERAL>
+| <FLOATING_POINT_LITERAL>
+| <CHARACTER_LITERAL>
+| <STRING_LITERAL>
+| BooleanLiteral()
+| NullLiteral()
+}
+
+void BooleanLiteral() :
+{}
+{
+  "true"
+| "false"
+}
+
+void NullLiteral() :
+{}
+{
+  "null"
+}
+
+void Arguments() :
+{}
+{
+  "(" [ ArgumentList() ] ")"
+}
+
+void ArgumentList() :
+{}
+{
+  Expression() ( "," Expression() )*
+}
+
+void AllocationExpression() :
+{}
+{
+  LOOKAHEAD(2)
+  "new" PrimitiveType() ArrayDimsAndInits()
+|
+  "new"
+  Name()
+    (
+      ArrayDimsAndInits()
+    |
+      Arguments() [ ClassBody() ]
+    )
+}
+
+/*
+ * The third LOOKAHEAD specification below is to parse to PrimarySuffix
+ * if there is an expression between the "[...]".
+ */
+void ArrayDimsAndInits() :
+{}
+{
+  LOOKAHEAD(2)
+  ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
+|
+  ( "[" "]" )+ ArrayInitializer()
+}
+
+/*--------------------------------------------------------------
+	Statement syntax follows
+--------------------------------------------------------------*/
+
+void Statement() :
+{}
+{
+  LOOKAHEAD(2)
+  LabeledStatement()
+|
+  Block()
+|
+  EmptyStatement()
+|
+  StatementExpression() ";"
+|
+  SwitchStatement()
+|
+  IfStatement()
+|
+  WhileStatement()
+|
+  DoStatement()
+|
+  ForStatement()
+|
+  BreakStatement()
+|
+  ContinueStatement()
+|
+  ReturnStatement()
+|
+  ThrowStatement()
+|
+  SynchronizedStatement()
+|
+  TryStatement()
+|					// Andrea Gini
+  AssertStatement()	// Andrea Gini
+}
+
+void LabeledStatement() :
+{}
+{
+  <IDENTIFIER> ":" Statement()
+}
+
+void Block() :
+{}
+{
+ /*{ // KARMA
+ s_ScopeStack.push(new ScopeDesc());
+ }*/
+  "{" ( BlockStatement() )* "}"
+ /*{ // KARMA
+ s_ScopeStack.pop();
+ }*/
+}
+
+void BlockStatement() :
+{}
+{
+  LOOKAHEAD([ "final" ] Type() <IDENTIFIER>)
+  LocalVariableDeclaration() ";"
+  |
+  Statement()
+  |
+  UnmodifiedClassDeclaration()
+  |
+  UnmodifiedInterfaceDeclaration()
+}
+
+void LocalVariableDeclaration() :
+{
+}
+{
+  [ "final" ]
+  Type()
+  VariableDeclarator()
+  (
+    "," VariableDeclarator()
+  )*
+}
+
+void EmptyStatement() :
+{}
+{
+  ";"
+}
+
+void StatementExpression() :
+/*
+ * The last expansion of this production accepts more than the legal
+ * Java expansions for StatementExpression.  This expansion does not
+ * use PostfixExpression for performance reasons.
+ */
+{}
+{
+  PreIncrementExpression()
+|
+  PreDecrementExpression()
+|
+  PrimaryExpression()
+  [
+    "++"
+  |
+    "--"
+  |
+    AssignmentOperator() Expression()
+  ]
+}
+
+void SwitchStatement() :
+{}
+{
+  "switch" "(" Expression() ")" "{"
+    ( SwitchLabel() ( BlockStatement() )* )*
+  "}"
+}
+
+void SwitchLabel() :
+{}
+{
+  "case" Expression() ":"
+|
+  "default" ":"
+}
+
+void IfStatement() :
+/*
+ * The disambiguating algorithm of JavaCC automatically binds dangling
+ * else's to the innermost if statement.  The LOOKAHEAD specification
+ * is to tell JavaCC that we know what we are doing.
+ */
+{}
+{
+  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+}
+
+void WhileStatement() :
+{}
+{
+  "while" "(" Expression() ")" Statement()
+}
+
+void DoStatement() :
+{}
+{
+  "do" Statement() "while" "(" Expression() ")" ";"
+}
+
+void ForStatement() :
+{}
+{
+  "for" "(" [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ] ")" Statement()
+}
+
+void ForInit() :
+{}
+{
+  LOOKAHEAD( [ "final" ] Type() <IDENTIFIER> )
+  LocalVariableDeclaration()
+|
+  StatementExpressionList()
+}
+
+void StatementExpressionList() :
+{}
+{
+  StatementExpression() ( "," StatementExpression() )*
+}
+
+void ForUpdate() :
+{}
+{
+  StatementExpressionList()
+}
+
+void BreakStatement() :
+{}
+{
+  "break" [ <IDENTIFIER> ] ";"
+}
+
+void ContinueStatement() :
+{}
+{
+  "continue" [ <IDENTIFIER> ] ";"
+}
+
+void ReturnStatement() :
+{}
+{
+  "return" [ Expression() ] ";"
+}
+
+void ThrowStatement() :
+{}
+{
+  "throw" Expression() ";"
+}
+
+void SynchronizedStatement() :
+{}
+{
+  "synchronized" "(" Expression() ")" Block()
+}
+
+void AssertStatement() :
+{}
+{
+  "assert" Expression() [ ":" Expression() ] ";"
+}
+
+void TryStatement() :
+/*
+ * Semantic check required here to make sure that at least one
+ * finally/catch is present.
+ */
+{}
+{
+  "try" Block()
+  ( "catch" "(" FormalParameter() ")" Block() )*
+  [ "finally" Block() ]
+}
