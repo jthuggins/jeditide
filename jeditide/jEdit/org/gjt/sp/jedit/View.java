@@ -454,7 +454,7 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 		if(searchBar == null)
 			searchBar = new SearchBar(this,true);
 		if(searchBar.getParent() == null)
-			addToolBar(TOP_GROUP,SEARCH_BAR_LAYER,searchBar);
+			addToolBar(BOTTOM_GROUP,SEARCH_BAR_LAYER,searchBar);
 
 		searchBar.setHyperSearch(false);
 
@@ -519,7 +519,7 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 		if(searchBar == null)
 			searchBar = new SearchBar(this,true);
 		if(searchBar.getParent() == null)
-			addToolBar(TOP_GROUP,SEARCH_BAR_LAYER,searchBar);
+			addToolBar(BOTTOM_GROUP,SEARCH_BAR_LAYER,searchBar);
 
 		searchBar.setHyperSearch(true);
 		searchBar.getField().setText(null);
@@ -1966,7 +1966,7 @@ loop:		while (true)
 		{
 			if(searchBar == null)
 				searchBar = new SearchBar(this,false);
-			addToolBar(TOP_GROUP,SEARCH_BAR_LAYER,searchBar);
+			addToolBar(BOTTOM_GROUP,SEARCH_BAR_LAYER,searchBar);
 		}
 	} //}}}
 
