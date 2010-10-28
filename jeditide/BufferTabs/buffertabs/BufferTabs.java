@@ -92,6 +92,7 @@ import org.gjt.sp.util.Log;
 public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetListener
 {
 	private static final String SORT_BUFFERS = "sortBuffers";
+	private static final int MAX_TITLE_LENGTH = 20;
 	private final EditPane editPane;
 	private final JComponent textArea;
 	BufferSet bufferSet;
@@ -117,6 +118,7 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 		mouseHandler = new MouseHandler();
 		mouseMotionHandler = new MouseMotionHandler();
 		knownBuffers = Collections.synchronizedSet(new HashSet<Buffer>());
+		setTabLayoutPolicy(SCROLL_TAB_LAYOUT);
 	}
 
 
@@ -631,24 +633,25 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 		setTabComponent(index,
 			jEdit.getBooleanProperty("buffertabs.closeButton", true));
 		Buffer buffer = bufferSet.getBuffer(index);
-		String title = buffer.getName();
+		StringBuffer title = new StringBuffer(buffer.getName());
 		Icon icon = null;
 		if (jEdit.getBooleanProperty("buffertabs.icons", true))
 		{
 			icon = buffer.getIcon();
 		}
-		else
+//		else
 		{
+			
 			if (buffer.isDirty())
 			{
-				title += "*";
+				title.insert(0, '*');
 			}
-			if (buffer.isNewFile())
-			{
-				title += " (new)";
-			}
+//			if (buffer.isNewFile())
+//			{
+//				title.append(" (new)");
+//			}
 		}
-		setTitleAt(index, title);
+		setTitleAt(index, (title.length() >= MAX_TITLE_LENGTH) ? title.substring(0, MAX_TITLE_LENGTH) : title.toString());
 		setIconAt(index, icon);
 		//if (index != this.getSelectedIndex() )
 		//	this.updateColorAt(this.getSelectedIndex());
