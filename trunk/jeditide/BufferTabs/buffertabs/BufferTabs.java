@@ -931,7 +931,9 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 					//set the focus on the selected buffer
 					int tabIndex = getTabAt(e.getX(), e.getY());
 					editPane.focusOnTextArea();
-					jEdit.closeBuffer(editPane, bufferSet.getBuffer(tabIndex));
+					if(tabIndex >=0 && tabIndex < bufferSet.size()) {
+						jEdit.closeBuffer(editPane, bufferSet.getBuffer(tabIndex));
+					}
 
 				}
 			}
