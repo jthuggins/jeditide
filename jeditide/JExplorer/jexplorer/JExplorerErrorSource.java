@@ -39,43 +39,43 @@ import errorlist.ErrorSourceUpdate;
  */
 public class JExplorerErrorSource extends DefaultErrorSource
 {
-/*------------------------------------------------------------------------------------------------------------------------------------
+	/*------------------------------------------------------------------------------------------------------------------------------------
 	<init>
 ------------------------------------------------------------------------------------------------------------------------------------*/
-public JExplorerErrorSource(String name)
-{
-super(name);
-}
-/*------------------------------------------------------------------------------------------------------------------------------------
+	public JExplorerErrorSource(String name)
+	{
+		super(name);
+	}
+	/*------------------------------------------------------------------------------------------------------------------------------------
 	removeFileErrors
 ------------------------------------------------------------------------------------------------------------------------------------*/
-public synchronized void removeFileErrors(String path)
-{
-final Vector list = (Vector)errors.remove(path);
-
-if(list == null)
-	return;
-
-errorCount -= list.size();
-//removeOrAddToBus();
-
-SwingUtilities.invokeLater(new Runnable()
+	public synchronized void removeFileErrors(String path)
 	{
-	public void run()
+		final Vector list = (Vector)errors.remove(path);
+
+		if(list == null)
+			return;
+
+		errorCount -= list.size();
+		//removeOrAddToBus();
+
+		SwingUtilities.invokeLater(new Runnable()
 		{
-		for(int i = 0; i < list.size(); i++)
+			public void run()
 			{
-			DefaultError error = (DefaultError)list.get(i);
+				for(int i = 0; i < list.size(); i++)
+				{
+					DefaultError error = (DefaultError)list.get(i);
 
-			ErrorSourceUpdate message = new ErrorSourceUpdate(
-				JExplorerErrorSource.this,
-				ErrorSourceUpdate.ERROR_REMOVED,
-				JExplorerErrorSource.this,
-				error);
+					ErrorSourceUpdate message = new ErrorSourceUpdate(
+							JExplorerErrorSource.this,
+							ErrorSourceUpdate.ERROR_REMOVED,
+							JExplorerErrorSource.this,
+							error);
 
-			EditBus.send(message);
+					EditBus.send(message);
+				}
 			}
-		}
-	});
-}
+		});
+	}
 }
