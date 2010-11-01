@@ -1372,8 +1372,6 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 	//{{{ updateFullScreenProps() method
 	public void updateFullScreenProps()
 	{
-		boolean alternateLayout = jEdit.getBooleanProperty(
-			"view.toolbar.alternateLayout");
 		boolean showMenu = jEdit.getBooleanProperty("fullScreenIncludesMenu");
 		boolean showToolbars = jEdit.getBooleanProperty("fullScreenIncludesToolbar");
 		boolean showStatus = jEdit.getBooleanProperty("fullScreenIncludesStatus");
@@ -1382,31 +1380,21 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 			menuBar = getJMenuBar();
 			setJMenuBar(null);
 		}
-		else if (menuBar != null)
+		else if (menuBar != null){
 			setJMenuBar(menuBar);
-		if (alternateLayout)
-		{
-			// Note: Bottom toolbar is the action bar, which is always enabled
-			if (! showToolbars)
-				getContentPane().remove(topToolBars);
-			else
-				getContentPane().add(BorderLayout.NORTH,topToolBars);
-			if (! showStatus)
-				removeToolBar(status);
-			else
-				addToolBar(BOTTOM_GROUP,STATUS_BAR_LAYER,status);
 		}
-		else
-		{
-			// Note: Bottom toolbar is the action bar, which is always enabled
-			if (! showToolbars)
-				mainPanel.remove(topToolBars);
-			else
-				mainPanel.add(topToolBars, BorderLayout.NORTH);
-			if (! showStatus)
-				getContentPane().remove(status);
-			else
-				getContentPane().add(BorderLayout.SOUTH,status);
+		// Note: Bottom toolbar is the action bar, which is always enabled
+		if (! showToolbars){
+			getContentPane().remove(topToolBars);
+		}
+		else {
+			getContentPane().add(BorderLayout.NORTH,topToolBars);
+		}
+		if (! showStatus) {
+			getContentPane().remove(status);
+		}
+		else{
+			getContentPane().add(BorderLayout.SOUTH,status);
 		}
 	} //}}}
 
@@ -1428,21 +1416,12 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 		{
 			boolean showStatus = plainView ? jEdit.getBooleanProperty("view.status.plainview.visible") :
 				jEdit.getBooleanProperty("view.status.visible");
-			if ((menuBar != null) && (getJMenuBar() != menuBar))
+			if ((menuBar != null) && (getJMenuBar() != menuBar)){
 				setJMenuBar(menuBar);
-			boolean alternateLayout = jEdit.getBooleanProperty(
-				"view.toolbar.alternateLayout");
-			if (alternateLayout)
-			{
-				getContentPane().add(BorderLayout.NORTH,topToolBars);
-				if (showStatus)
-					addToolBar(BOTTOM_GROUP,STATUS_BAR_LAYER,status);
 			}
-			else
-			{
-				mainPanel.add(topToolBars, BorderLayout.NORTH);
-				if (showStatus)
-					getContentPane().add(BorderLayout.SOUTH,status);
+			getContentPane().add(BorderLayout.NORTH,topToolBars);
+			if (showStatus){
+				getContentPane().add(BorderLayout.SOUTH,status);
 			}
 			setUndecorated(false);
 			setBounds(windowedBounds);
@@ -1861,19 +1840,10 @@ loop:		while (true)
 
 		boolean showStatus = plainView ? jEdit.getBooleanProperty("view.status.plainview.visible") :
 				    jEdit.getBooleanProperty("view.status.visible");
-		if (jEdit.getBooleanProperty("view.toolbar.alternateLayout"))
-		{
-			getContentPane().add(BorderLayout.NORTH,topToolBars);
-			getContentPane().add(BorderLayout.SOUTH,bottomToolBars);
-			if (showStatus)
-				addToolBar(BOTTOM_GROUP,STATUS_BAR_LAYER,status);
-		}
-		else
-		{
-			mainPanel.add(topToolBars, BorderLayout.NORTH);
-			mainPanel.add(bottomToolBars, BorderLayout.SOUTH);
-			if (showStatus)
-				getContentPane().add(BorderLayout.SOUTH,status);
+		getContentPane().add(BorderLayout.NORTH,topToolBars);
+		mainPanel.add(bottomToolBars, BorderLayout.SOUTH);
+		if (showStatus) {
+			getContentPane().add(BorderLayout.SOUTH,status);
 		}
 		updateBufferSwitcherStates();
 
