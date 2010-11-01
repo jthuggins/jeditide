@@ -53,15 +53,11 @@ public class ViewOptionPane extends AbstractOptionPane
 
 		if(jEdit.getBooleanProperty("view.docking.alternateLayout"))
 		{
-			layout = new JLabel(jEdit.getBooleanProperty(
-				"view.toolbar.alternateLayout")
-				? layoutIcon4 : layoutIcon2);
+			layout = new JLabel(layoutIcon4);
 		}
 		else
 		{
-			layout = new JLabel(jEdit.getBooleanProperty(
-				"view.toolbar.alternateLayout")
-				? layoutIcon3 : layoutIcon1);
+			layout = new JLabel(layoutIcon3);
 		}
 
 		layout.setBorder(new EmptyBorder(12,12,12,12));
@@ -73,9 +69,6 @@ public class ViewOptionPane extends AbstractOptionPane
 			"options.view.alternateDockingLayout")));
 		ActionHandler actionHandler = new ActionHandler();
 		alternateDockingLayout.addActionListener(actionHandler);
-		buttons.add(alternateToolBarLayout = new JButton(jEdit.getProperty(
-			"options.view.alternateToolBarLayout")));
-		alternateToolBarLayout.addActionListener(actionHandler);
 		layoutPanel.add(BorderLayout.SOUTH,buttons);
 
 		TitledBorder border = new TitledBorder(jEdit.getProperty(
@@ -213,7 +206,7 @@ public class ViewOptionPane extends AbstractOptionPane
 	//{{{ Private members
 	private JLabel layout;
 	private Icon layoutIcon1, layoutIcon2, layoutIcon3, layoutIcon4;
-	private JButton alternateDockingLayout, alternateToolBarLayout;
+	private JButton alternateDockingLayout;
 	private JCheckBox showFullPath;
 	private JCheckBox showSearchbar;
 	private JCheckBox beepOnSearchAutoWrap;
@@ -236,25 +229,12 @@ public class ViewOptionPane extends AbstractOptionPane
 		{
 			if(evt.getSource() == alternateDockingLayout)
 			{
-				if(layout.getIcon() == layoutIcon1)
-					layout.setIcon(layoutIcon2);
-				else if(layout.getIcon() == layoutIcon2)
-					layout.setIcon(layoutIcon1);
-				else if(layout.getIcon() == layoutIcon3)
+				if(layout.getIcon() == layoutIcon3){
 					layout.setIcon(layoutIcon4);
-				else if(layout.getIcon() == layoutIcon4)
+				}
+				else if(layout.getIcon() == layoutIcon4){
 					layout.setIcon(layoutIcon3);
-			}
-			else if(evt.getSource() == alternateToolBarLayout)
-			{
-				if(layout.getIcon() == layoutIcon1)
-					layout.setIcon(layoutIcon3);
-				else if(layout.getIcon() == layoutIcon3)
-					layout.setIcon(layoutIcon1);
-				else if(layout.getIcon() == layoutIcon2)
-					layout.setIcon(layoutIcon4);
-				else if(layout.getIcon() == layoutIcon4)
-					layout.setIcon(layoutIcon2);
+				}
 			}
 			else if (evt.getSource() == showBufferSwitcher)
 			{
