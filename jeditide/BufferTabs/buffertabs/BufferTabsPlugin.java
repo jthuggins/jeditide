@@ -96,10 +96,7 @@ public class BufferTabsPlugin extends EBPlugin
 
 	private static void editPaneCreated(EditPane editPane)
 	{
-		if (jEdit.getBooleanProperty("buffertabs.enable", false))
-		{
-			addBufferTabsToEditPane(editPane);
-		}
+		addBufferTabsToEditPane(editPane);
 	}
 
 
@@ -110,20 +107,11 @@ public class BufferTabsPlugin extends EBPlugin
 
 	private static void propertiesChanged()
 	{
-		final String location = BufferTabsOptionPane
-			.getLocationProperty("buffertabs.location", "bottom");
-
 		jEdit.visit(new JEditVisitorAdapter()
 		{
 			@Override
 			public void visit(EditPane editPane)
 			{
-				BufferTabs bt = tabsMap.get(editPane);
-				if (bt != null)
-				{
-					bt.setTabPlacement(location);
-					bt.updateTitles();
-				}
 			}
 		});
 	}
@@ -133,27 +121,13 @@ public class BufferTabsPlugin extends EBPlugin
 		return editPane != null ? tabsMap.get(editPane) : null;
 	}
 
-	public static void toggleBufferTabsForEditPane(EditPane editPane)
-	{
-		boolean vis = !tabsMap.containsKey(editPane);
-		if (vis)
-		{
-			addBufferTabsToEditPane(editPane);
-		}
-		else
-		{
-			removeBufferTabsFromEditPane(editPane);
-		}
-	}
-
 	private static void addBufferTabsToEditPane(EditPane editPane)
 	{
 		Component ta = editPane.getTextArea();
 		Container container = ta.getParent();
 
 		BufferTabs tabs = new BufferTabs(editPane);
-		tabs.setTabPlacement(BufferTabsOptionPane.getLocationProperty(
-			"buffertabs.location", "bottom"));
+		tabs.setTabPlacement(JTabbedPane.TOP);
 		tabs.start();
 		container.add(tabs);
 		tabsMap.put(editPane, tabs);

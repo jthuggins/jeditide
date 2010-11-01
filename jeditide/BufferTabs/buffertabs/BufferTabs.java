@@ -321,8 +321,7 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 
 			insertTab(buffer.getName(), null, component, buffer.getPath(), index);
 			updateTitleAt(index);
-			if (jEdit.getBooleanProperty("buffertabs.closeButton", true))
-				setTabComponent(index, true);
+			setTabComponent(index, true);
 			//	 int selectedIndex = this.buffers.indexOf(this.editPane.getBuffer());
 			//      this.setSelectedIndex(selectedIndex);
 			//Log.log(Log.MESSAGE, BufferTabs.class, "selected : 1 " + selectedIndex +" index "+ index  );
@@ -630,8 +629,7 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 		{
 			return;
 		}
-		setTabComponent(index,
-			jEdit.getBooleanProperty("buffertabs.closeButton", true));
+		setTabComponent(index, true);
 		Buffer buffer = bufferSet.getBuffer(index);
 		StringBuffer title = new StringBuffer(buffer.getName());
 		Icon icon = null;
@@ -666,26 +664,6 @@ public class BufferTabs extends JTabbedPane implements EBComponent, BufferSetLis
 			updateTitleAt(index);
 		}
 	}
-
-	public void setTabPlacement(String location)
-	{
-		location = location.toLowerCase();
-		int placement = BOTTOM;
-		if ("top".equals(location))
-		{
-			placement = TOP;
-		}
-		else if ("left".equals(location))
-		{
-			placement = LEFT;
-		}
-		else if ("right".equals(location))
-		{
-			placement = RIGHT;
-		}
-		setTabPlacement(placement);
-	}
-
 
 	/**
 	 * Overridden so the JEditTextArea is at every index.
