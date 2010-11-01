@@ -42,11 +42,8 @@ import org.gjt.sp.jedit.AbstractOptionPane;
 
 @SuppressWarnings("serial")
 public class BufferTabsOptionPane extends AbstractOptionPane implements ItemListener {
-    private JCheckBox enableCB;
     private JCheckBox iconsCB;
     private JCheckBox popupCB;
-    private JCheckBox closeButtonCB;
-    private JComboBox locationChoice;
 
     private JRadioButton colorTabRB;
     private JRadioButton colorTextRB;
@@ -66,155 +63,136 @@ public class BufferTabsOptionPane extends AbstractOptionPane implements ItemList
 
     public void _init() {
 		
-       final Dimension ySpace = new Dimension(0, 10);
-       final Dimension xSpace = new Dimension(15, 0);
-        enableCB = new JCheckBox(jEdit.getProperty("options.buffertabs.enable.label"));
-        addComponent(enableCB);
-		addSeparator("options.buffertabs.mouse-options.label");
-        popupCB = new JCheckBox(jEdit.getProperty("options.buffertabs.popup.label"));
-        addComponent(popupCB);
-        closeButtonCB = new JCheckBox(jEdit.getProperty("options.buffertabs.closeButton.label"));
-        addComponent(closeButtonCB);
+    	final Dimension ySpace = new Dimension(0, 10);
+    	final Dimension xSpace = new Dimension(15, 0);
+    	addSeparator("options.buffertabs.mouse-options.label");
+    	popupCB = new JCheckBox(jEdit.getProperty("options.buffertabs.popup.label"));
+    	addComponent(popupCB);
 
-       addComponent(new Box.Filler(ySpace, ySpace, ySpace));
-       
-       addComponent(new JLabel(jEdit.getProperty("options.buffertabs.close-tab-on.label")));
-        
-       JPanel checkBoxPanel = new JPanel(new GridBagLayout());
-       GridBagConstraints c = new GridBagConstraints();
-       c.anchor = GridBagConstraints.LINE_START;
-       
-       doubleClickCB = new JCheckBox(jEdit.getProperty("options.buffertabs.close-tab-on.double-left-click.label"));
-       middleClickCB = new JCheckBox(jEdit.getProperty("options.buffertabs.close-tab-on.single-middle-click.label"));
-        
-        c.gridy = 0;
-        c.gridx = 0;
-        c.gridwidth = 1;
-        checkBoxPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
-        
-        c.gridy = 0;
-        c.gridx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        checkBoxPanel.add(doubleClickCB, c);
-        
-        c.gridy = 1;
-        c.gridx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        checkBoxPanel.add(middleClickCB, c);
-        
-        addComponent(checkBoxPanel);
-        
-        addSeparator("options.buffertabs.layout-and-style-options.label");
-        
-        iconsCB = new JCheckBox(jEdit.getProperty("options.buffertabs.icons.label"));
-        addComponent(iconsCB);
-        addComponent(new Box.Filler(ySpace, ySpace, ySpace));
-        
-        locationChoice = new JComboBox(new String[] { "top", "bottom", "left", "right"});
-        JPanel locationChoicePanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0 , 0));
-        locationChoicePanel.add(new JLabel(jEdit.getProperty("options.buffertabs.location.label") + " "));
-        locationChoicePanel.add(locationChoice);
-        addComponent(locationChoicePanel);
-        
-        addComponent(new Box.Filler(ySpace, ySpace, ySpace));
+    	addComponent(new Box.Filler(ySpace, ySpace, ySpace));
 
-        enableColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-tabs.label" ) );
-        enableColorsCB.addItemListener( this );
-        addComponent( enableColorsCB );
+    	addComponent(new JLabel(jEdit.getProperty("options.buffertabs.close-tab-on.label")));
 
-        
-        JPanel colorTabPanel = new JPanel(new GridBagLayout());
-        
-        c.gridy = 0;
-        c.gridx = 0;
-        c.gridwidth = 1;
-        colorTabPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
-        
-        colorTabRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-background.label" ) );
-        colorTextRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-foreground.label" ) );
-        ButtonGroup group = new ButtonGroup();
-        group.add( colorTabRB );
-        group.add( colorTextRB );
-        
-        JPanel colorPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        colorPanel.add(colorTabRB);
-        colorPanel.add(colorTextRB);
-        
-        c.gridy = 0;
-        c.gridx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        colorTabPanel.add(colorPanel, c);
-         
-        highlightColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-selected.label" ) );
-        highlightColorsCB.addItemListener( this );
+    	JPanel checkBoxPanel = new JPanel(new GridBagLayout());
+    	GridBagConstraints c = new GridBagConstraints();
+    	c.anchor = GridBagConstraints.LINE_START;
 
-        
-        c.gridy = 1;
-        c.gridx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        colorTabPanel.add(highlightColorsCB, c);
-        
-        c.gridy = 2;
-        c.gridx = 1;
-        c.gridwidth = 1;
-        colorTabPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
-        
-        colorSelTabRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-selected-background.label" ) );
+    	doubleClickCB = new JCheckBox(jEdit.getProperty("options.buffertabs.close-tab-on.double-left-click.label"));
+    	middleClickCB = new JCheckBox(jEdit.getProperty("options.buffertabs.close-tab-on.single-middle-click.label"));
 
-        colorSelTextRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-selected-foreground.label" ) );
+    	c.gridy = 0;
+    	c.gridx = 0;
+    	c.gridwidth = 1;
+    	checkBoxPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
 
-        ButtonGroup groupSel = new ButtonGroup();
-        groupSel.add( colorSelTabRB );
-        groupSel.add( colorSelTextRB );
-        
-        JPanel colorSelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
-        colorSelPanel.add(colorSelTabRB);
-        colorSelPanel.add(colorSelTextRB);
-        
-        c.gridy = 2;
-        c.gridx = 2;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        colorTabPanel.add(colorSelPanel, c);
-		
-        muteColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-mute.label" ) );
-        muteColorsCB.addItemListener( this );
-        
-        c.gridy = 3;
-        c.gridx = 1;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        colorTabPanel.add(muteColorsCB, c);
-        
-        variationColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-variation.label" ) );
-        variationColorsCB.addItemListener( this );
+    	c.gridy = 0;
+    	c.gridx = 1;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	checkBoxPanel.add(doubleClickCB, c);
 
-        
-        c.gridy = 4;
-        c.gridx = 2;
-        c.gridwidth = GridBagConstraints.REMAINDER;
-        colorTabPanel.add(variationColorsCB, c);
-        
-        addComponent(colorTabPanel);
+    	c.gridy = 1;
+    	c.gridx = 1;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	checkBoxPanel.add(middleClickCB, c);
 
-        load();
+    	addComponent(checkBoxPanel);
+
+    	addSeparator("options.buffertabs.layout-and-style-options.label");
+
+    	iconsCB = new JCheckBox(jEdit.getProperty("options.buffertabs.icons.label"));
+    	addComponent(iconsCB);
+    	addComponent(new Box.Filler(ySpace, ySpace, ySpace));
+
+
+    	addComponent(new Box.Filler(ySpace, ySpace, ySpace));
+
+    	enableColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-tabs.label" ) );
+    	enableColorsCB.addItemListener( this );
+    	addComponent( enableColorsCB );
+
+
+    	JPanel colorTabPanel = new JPanel(new GridBagLayout());
+
+    	c.gridy = 0;
+    	c.gridx = 0;
+    	c.gridwidth = 1;
+    	colorTabPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
+
+    	colorTabRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-background.label" ) );
+    	colorTextRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-foreground.label" ) );
+    	ButtonGroup group = new ButtonGroup();
+    	group.add( colorTabRB );
+    	group.add( colorTextRB );
+
+    	JPanel colorPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    	colorPanel.add(colorTabRB);
+    	colorPanel.add(colorTextRB);
+
+    	c.gridy = 0;
+    	c.gridx = 1;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	colorTabPanel.add(colorPanel, c);
+
+    	highlightColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-selected.label" ) );
+    	highlightColorsCB.addItemListener( this );
+
+
+    	c.gridy = 1;
+    	c.gridx = 1;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	colorTabPanel.add(highlightColorsCB, c);
+
+    	c.gridy = 2;
+    	c.gridx = 1;
+    	c.gridwidth = 1;
+    	colorTabPanel.add(new Box.Filler(xSpace, xSpace, xSpace), c);
+
+    	colorSelTabRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-selected-background.label" ) );
+
+    	colorSelTextRB = new JRadioButton( jEdit.getProperty( "options.buffertabs.color-selected-foreground.label" ) );
+
+    	ButtonGroup groupSel = new ButtonGroup();
+    	groupSel.add( colorSelTabRB );
+    	groupSel.add( colorSelTextRB );
+
+    	JPanel colorSelPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+    	colorSelPanel.add(colorSelTabRB);
+    	colorSelPanel.add(colorSelTextRB);
+
+    	c.gridy = 2;
+    	c.gridx = 2;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	colorTabPanel.add(colorSelPanel, c);
+
+    	muteColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-mute.label" ) );
+    	muteColorsCB.addItemListener( this );
+
+    	c.gridy = 3;
+    	c.gridx = 1;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	colorTabPanel.add(muteColorsCB, c);
+
+    	variationColorsCB = new JCheckBox( jEdit.getProperty( "options.buffertabs.color-variation.label" ) );
+    	variationColorsCB.addItemListener( this );
+
+
+    	c.gridy = 4;
+    	c.gridx = 2;
+    	c.gridwidth = GridBagConstraints.REMAINDER;
+    	colorTabPanel.add(variationColorsCB, c);
+
+    	addComponent(colorTabPanel);
+
+    	load();
     }
 
 
     public void load() {
-        enableCB.setSelected(
-            jEdit.getBooleanProperty("buffertabs.enable", false)
-        );
         iconsCB.setSelected(
             jEdit.getBooleanProperty("buffertabs.icons", true)
         );
         popupCB.setSelected(
             jEdit.getBooleanProperty("buffertabs.usePopup", true)
-        );
-        closeButtonCB.setSelected(
-        	jEdit.getBooleanProperty("buffertabs.closeButton", true)
-        );
-        
-        locationChoice.setSelectedItem(
-            getLocationProperty("buffertabs.location", "bottom")
         );
 
         doubleClickCB.setSelected(
@@ -275,12 +253,8 @@ public class BufferTabsOptionPane extends AbstractOptionPane implements ItemList
      * This should save any properties saved in this option pane.
      */
     public void _save() {
-        jEdit.setBooleanProperty("buffertabs.enable", enableCB.isSelected());
         jEdit.setBooleanProperty("buffertabs.icons", iconsCB.isSelected());
         jEdit.setBooleanProperty("buffertabs.usePopup", popupCB.isSelected());
-        jEdit.setBooleanProperty("buffertabs.closeButton", closeButtonCB.isSelected());
-        jEdit.setProperty("buffertabs.location",
-        locationChoice.getSelectedItem().toString());
 
          //CES: Color tabs
         jEdit.setBooleanProperty( "buffertabs.color-tabs", enableColorsCB.isSelected() );
