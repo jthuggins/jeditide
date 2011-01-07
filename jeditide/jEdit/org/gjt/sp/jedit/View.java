@@ -1253,7 +1253,7 @@ public class View extends JFrame implements EBComponent, InputHandlerProvider
 	public void updateTitle()
 	{
 		List<Buffer> buffers = new ArrayList<Buffer>();
-		EditPane[] editPanes = getEditPanes();
+		EditPane[] editPanes = new EditPane[] {getEditPane()};
 		for(int i = 0; i < editPanes.length; i++)
 		{
 			Buffer buffer = editPanes[i].getBuffer();
@@ -1969,6 +1969,7 @@ loop:		while (true)
 		// repaint the gutter so that the border color
 		// reflects the focus state
 		updateGutterBorders();
+		updateTitle();
 
 		EditBus.send(new ViewUpdate(this,ViewUpdate.EDIT_PANE_CHANGED));
 	} //}}}
