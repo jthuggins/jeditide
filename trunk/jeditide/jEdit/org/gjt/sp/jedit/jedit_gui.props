@@ -852,7 +852,7 @@ whitespace-home.label=Go to Start of White Space
 
 # Title
 view.title=jEdit -\ 
-view.title.dirty=\ (modified)
+view.title.dirty=\ *
 
 view.docking.close-tooltip=Hides the current docked window
 view.docking.menu-tooltip=Docking options
