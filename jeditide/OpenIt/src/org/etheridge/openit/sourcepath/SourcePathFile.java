@@ -144,8 +144,15 @@ public abstract class SourcePathFile implements Comparable {
                 mDirectoryString = file.getAbsolutePath();
                 
                 if(jEdit.getBooleanProperty(OpenItProperties.IMPORT_FILES_FROM_CURRENT_PROJECT, false)) {
-                        String sourcePath = jEdit.getProperty(OpenItProperties.SOURCE_PATH_STRING);
+                        String [] sourcePaths = jEdit.getProperty(OpenItProperties.SOURCE_PATH_STRING).split(File.pathSeparator);
                         String fullPath = file.getAbsolutePath();
+						String sourcePath = "";
+						for(int i = 0; i < sourcePaths.length; i++) {
+						    if(fullPath.startsWith(sourcePaths[i])) {
+							    sourcePath = sourcePaths[i];
+								break;
+							}
+						}
                         mProjectString = fullPath.substring(sourcePath.length() + 1, fullPath.length());
                 }
         }

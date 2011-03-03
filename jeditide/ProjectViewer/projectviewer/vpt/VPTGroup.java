@@ -65,6 +65,28 @@ public class VPTGroup extends VPTNode {
 		return getName() + File.separator;
 	} //}}}
 
+	//{{{ +getChildPaths() : String
+	/**	Returns the paths to this group's projects. */
+	public String getChildPaths() {
+        StringBuffer path = new StringBuffer("");
+        lock(false);
+        try{
+            if(getAllowsChildren()) {
+                for(int i = 0; i < getChildCount(); i++) {
+                    VPTNode node = (VPTNode)getChildAt(i);
+                    if(node.isGroup()) {
+                        path.append(((VPTGroup)node).getChildPaths());
+                    }else if(node.isProject()) {
+                        path.append(node.getNodePath() + File.pathSeparator);
+                    }
+                }
+            }
+        } finally {
+            unlock(false);
+        }
+        return path.toString();
+	} //}}}
+
 	//{{{ +compareTo(VPTNode) : int
 	public int compareTo(VPTNode n)
 	{

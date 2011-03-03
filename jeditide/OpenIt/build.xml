@@ -35,7 +35,46 @@
         </javac>
     </target>
 
+    <target name="compile-debug" depends="init">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" deprecation="on" includeJavaRuntime="yes" debug="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
+
     <target name="dist" depends="compile">
+    
+    <!-- create installation directory -->
+        <mkdir dir="${install.dir}"/>
+    
+    <!-- create jar file -->
+        <jar jarfile="${jedit.plugins.dir}/${jar.name}">
+      
+      <!-- add compiled classes to jar -->
+            <fileset dir="${build.dir}"/>
+			
+      <!-- add any required files from the source directory (not java files) -->
+            <fileset dir="${src.dir}">
+                <include name="actions.xml"/>
+                <include name="**/*.props"/>
+                <include name="**/*.html"/>
+                <include name="**/*.jpg"/>
+                <include name="**/*.gif"/>
+            </fileset>
+      
+      <!-- add any documentation -->
+            <fileset dir="${docs.dir}">
+                <include name="**/*.xml"/>
+                <include name="**/*.props"/>
+                <include name="**/*.html"/>
+                <include name="**/*.gif"/>
+                <include name="**/*.jpg"/>
+                <include name="**/*.png"/>
+            </fileset>
+
+        </jar>
+    </target>
+	
+    <target name="dist-debug" depends="compile-debug">
     
     <!-- create installation directory -->
         <mkdir dir="${install.dir}"/>

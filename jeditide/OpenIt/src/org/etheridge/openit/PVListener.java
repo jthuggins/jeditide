@@ -28,12 +28,12 @@ import org.gjt.sp.jedit.jEdit;
 
 import projectviewer.event.StructureUpdate;
 import projectviewer.event.ViewerUpdate;
+import projectviewer.vpt.VPTGroup;
 import projectviewer.vpt.VPTNode;
 
 public class PVListener implements EBComponent {
 
         public void projectLoaded(VPTNode node) {
-				System.err.println("New project activated: node="+node.getNodePath());
                 refresh(node.getNodePath());
         }
         
@@ -42,8 +42,10 @@ public class PVListener implements EBComponent {
         }
         
         public void groupActivated(VPTNode node) {
-				System.err.println("New group activated: node="+node.getNodePath());
-                refresh(node.getNodePath());
+		        if(node.isGroup()) {
+				    VPTGroup grp = (VPTGroup)node;
+                    refresh(grp.getChildPaths());
+				}
         }
         
         private void refresh(final String sourcePath) {
@@ -57,7 +59,6 @@ public class PVListener implements EBComponent {
                 }
         }
     	public void handleMessage(EBMessage message) {
-		    System.err.println("+++++++HANDLING MESSAGE++++++");
     		if (message instanceof StructureUpdate) {
     			StructureUpdate su = (StructureUpdate) message;
     			if (su.getType() == StructureUpdate.Type.PROJECT_ADDED)
