@@ -75,7 +75,8 @@ public class QuickAccessSourcePath
         // z -> [Zebra.java]
         
         private Map<String, List> mQuickAccessMap;
-	      private HashMap<String, Boolean> projectsFiles;
+
+	    private HashMap<String, Boolean> projectsFiles;
         
         /**
          * Substring index size - this integer determines how many characters should
@@ -227,22 +228,7 @@ public class QuickAccessSourcePath
         // Returns the current ProjectViewer project files.
         // If ProjectViewer not installed returns null;
         private HashMap<String, Boolean> getProjectsFiles() {
-                HashMap<String, Boolean> result = null;
-		
-                if (jEdit.getBooleanProperty(OpenItProperties.IMPORT_FILES_FROM_CURRENT_PROJECT)) {
-			result = new HashMap<String, Boolean>();
-                        VPTProject currentProject = ProjectViewer.getActiveProject(jEdit.getActiveView());
-                        if (currentProject != null) {
-                                Collection nodes  = currentProject.getOpenableNodes();
-                                Iterator iter = nodes.iterator();
-                                
-                                while (iter.hasNext()) {
-                                        VPTFile vptFile = (VPTFile)iter.next();
-                                        result.put(vptFile.getNodePath(), true);
-                                }
-                        }
-                }
-		return result;
+		    return null;
         }
 }
 
