@@ -252,7 +252,7 @@ public class TigerParser implements TigerParserConstants {
     label_1:
     while (true) {
       production_node = production();
-                                   children.add(production_node);
+      children.add(production_node);
       if (jj_2_1(1)) {
         ;
       } else {
@@ -321,7 +321,7 @@ public class TigerParser implements TigerParserConstants {
     } else if (getToken(1).kind == IDENTIFIER && getToken(1).image.equals("IGNORE_CASE")) {
       identifier();
     } else {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case IDENTIFIER:
         jj_consume_token(IDENTIFIER);
         break;
@@ -334,7 +334,7 @@ public class TigerParser implements TigerParserConstants {
       }
     }
     jj_consume_token(ASSIGN);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case INTEGER_LITERAL:
       IntegerLiteral();
       break;
@@ -376,7 +376,7 @@ public class TigerParser implements TigerParserConstants {
          */
         tn = token_manager_decls();
     } else {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -420,7 +420,7 @@ public class TigerParser implements TigerParserConstants {
       Name();
       label_3:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -467,13 +467,13 @@ public class TigerParser implements TigerParserConstants {
     resultType = ResultType();
     identifier = identifier();
     params = FormalParameters();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case THROWS:
       jj_consume_token(THROWS);
       Name();
       label_4:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -487,7 +487,7 @@ public class TigerParser implements TigerParserConstants {
     default:
       ;
     }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case 125:
       node_descriptor();
       break;
@@ -524,7 +524,7 @@ public class TigerParser implements TigerParserConstants {
     TigerNode tn = new RegexProductionNode();
     Token kind = null;
     StringBuffer lexical_state_list = new StringBuffer();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case LT:
       if (jj_2_8(2)) {
         start_t = jj_consume_token(LT);
@@ -532,14 +532,14 @@ public class TigerParser implements TigerParserConstants {
         jj_consume_token(GT);
                                       lexical_state_list.append("<*>");
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LT:
           start_t = jj_consume_token(LT);
           t = jj_consume_token(IDENTIFIER);
                                 lexical_state_list.append("<").append(t.image);
           label_5:
           while (true) {
-            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            switch (get_ntk()) {
             case COMMA:
               ;
               break;
@@ -548,10 +548,10 @@ public class TigerParser implements TigerParserConstants {
             }
             jj_consume_token(COMMA);
             t = jj_consume_token(IDENTIFIER);
-                                                                                                       lexical_state_list.append(",").append(t.image);
+            lexical_state_list.append(",").append(t.image);
           }
           jj_consume_token(GT);
-                                                                                                                                                                lexical_state_list.append(">");
+          lexical_state_list.append(">");
           break;
         default:
           jj_consume_token(-1);
@@ -563,7 +563,7 @@ public class TigerParser implements TigerParserConstants {
       ;
     }
     kind = regexpr_kind();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case LBRACKET:
       jj_consume_token(LBRACKET);
       if (getToken(1).kind == IDENTIFIER && getToken(1).image.equals("IGNORE_CASE")) {
@@ -583,7 +583,7 @@ public class TigerParser implements TigerParserConstants {
     regexpr_spec();
     label_6:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BIT_OR:
         ;
         break;
@@ -649,14 +649,14 @@ public class TigerParser implements TigerParserConstants {
 
   final public void regexpr_spec() throws ParseException {
     regular_expression();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case LBRACE:
       Block();
       break;
     default:
       ;
     }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case COLON:
       jj_consume_token(COLON);
       jj_consume_token(IDENTIFIER);
@@ -670,7 +670,7 @@ public class TigerParser implements TigerParserConstants {
     expansion();
     label_7:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BIT_OR:
         ;
         break;
@@ -700,7 +700,7 @@ public class TigerParser implements TigerParserConstants {
     label_8:
     while (true) {
       expansion_unit();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case 125:
         node_descriptor();
         break;
@@ -717,7 +717,7 @@ public class TigerParser implements TigerParserConstants {
 
   final public void local_lookahead() throws ParseException {
       boolean commaAtEnd = false, emptyLA = true;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case INTEGER_LITERAL:
       IntegerLiteral();
       emptyLA = false;
@@ -765,7 +765,7 @@ public class TigerParser implements TigerParserConstants {
       local_lookahead();
       jj_consume_token(RPAREN);
     } else {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LBRACE:
         Block();
         break;
@@ -781,7 +781,7 @@ public class TigerParser implements TigerParserConstants {
         jj_consume_token(RBRACE);
         label_9:
         while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case CATCH:
             ;
             break;
@@ -795,7 +795,7 @@ public class TigerParser implements TigerParserConstants {
           jj_consume_token(RPAREN);
           Block();
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case FINALLY:
           jj_consume_token(FINALLY);
           Block();
@@ -812,7 +812,7 @@ public class TigerParser implements TigerParserConstants {
           } else {
             ;
           }
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case STRING_LITERAL:
           case LT:
             regular_expression();
@@ -826,16 +826,16 @@ public class TigerParser implements TigerParserConstants {
             throw new ParseException();
           }
         } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case LPAREN:
             jj_consume_token(LPAREN);
             expansion_choices();
             jj_consume_token(RPAREN);
-            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            switch (get_ntk()) {
             case HOOK:
             case PLUS:
             case STAR:
-              switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+              switch (get_ntk()) {
               case PLUS:
                 jj_consume_token(PLUS);
                 break;
@@ -864,17 +864,17 @@ public class TigerParser implements TigerParserConstants {
   }
 
   final public void regular_expression() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case STRING_LITERAL:
       StringLiteral();
       break;
     default:
       if (jj_2_13(3)) {
         jj_consume_token(LT);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case IDENTIFIER:
         case 125:
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case 125:
             jj_consume_token(125);
             break;
@@ -894,7 +894,7 @@ public class TigerParser implements TigerParserConstants {
         identifier();
         jj_consume_token(GT);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LT:
           jj_consume_token(LT);
           if (getToken(1).kind == IDENTIFIER && getToken(1).image.equals("EOF")) {
@@ -918,7 +918,7 @@ public class TigerParser implements TigerParserConstants {
     complex_regular_expression();
     label_10:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BIT_OR:
         ;
         break;
@@ -934,7 +934,7 @@ public class TigerParser implements TigerParserConstants {
     label_11:
     while (true) {
       complex_regular_expression_unit();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case STRING_LITERAL:
       case LPAREN:
       case LBRACKET:
@@ -949,7 +949,7 @@ public class TigerParser implements TigerParserConstants {
   }
 
   final public void complex_regular_expression_unit() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case STRING_LITERAL:
       StringLiteral();
       break;
@@ -966,11 +966,11 @@ public class TigerParser implements TigerParserConstants {
       jj_consume_token(LPAREN);
       complex_regular_expression_choices();
       jj_consume_token(RPAREN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case HOOK:
       case PLUS:
       case STAR:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case PLUS:
           jj_consume_token(PLUS);
           break;
@@ -996,7 +996,7 @@ public class TigerParser implements TigerParserConstants {
   }
 
   final public void character_list() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case TILDE:
       jj_consume_token(TILDE);
       break;
@@ -1004,12 +1004,12 @@ public class TigerParser implements TigerParserConstants {
       ;
     }
     jj_consume_token(LBRACKET);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case STRING_LITERAL:
       character_descriptor();
       label_12:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -1028,7 +1028,7 @@ public class TigerParser implements TigerParserConstants {
 
   final public void character_descriptor() throws ParseException {
     StringLiteral();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case MINUS:
       jj_consume_token(MINUS);
       StringLiteral();
@@ -1050,7 +1050,7 @@ public class TigerParser implements TigerParserConstants {
  **********************************************/
   final public void node_descriptor() throws ParseException {
     jj_consume_token(125);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case IDENTIFIER:
       jj_consume_token(IDENTIFIER);
       break;
@@ -1061,10 +1061,10 @@ public class TigerParser implements TigerParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case LPAREN:
       jj_consume_token(LPAREN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case GT:
         jj_consume_token(GT);
         break;
@@ -1131,7 +1131,7 @@ public class TigerParser implements TigerParserConstants {
     String packageName = "";
     ImportNode in = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case PACKAGE:
         packageName = PackageDeclaration();
         break;
@@ -1140,7 +1140,7 @@ public class TigerParser implements TigerParserConstants {
       }
       label_13:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case IMPORT:
           ;
           break;
@@ -1152,7 +1152,7 @@ public class TigerParser implements TigerParserConstants {
       }
       label_14:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case ABSTRACT:
         case CLASS:
         case ENUM:
@@ -1235,7 +1235,7 @@ public class TigerParser implements TigerParserConstants {
     Token et = null;
     try {
       st = jj_consume_token(IMPORT);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case STATIC:
         jj_consume_token(STATIC);
         break;
@@ -1348,7 +1348,7 @@ public class TigerParser implements TigerParserConstants {
    Modifier modifier;
    TigerNode tn = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case SEMICOLON:
         jj_consume_token(SEMICOLON);
         break;
@@ -1368,7 +1368,7 @@ public class TigerParser implements TigerParserConstants {
       case VOLATILE:
       case AT:
         modifier = Modifiers();
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case CLASS:
         case INTERFACE:
           tn = ClassOrInterfaceDeclaration(modifier);
@@ -1408,7 +1408,7 @@ public class TigerParser implements TigerParserConstants {
    List<TigerNode> implements_list = null;
    Token type = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case CLASS:
         type = jj_consume_token(CLASS);
         break;
@@ -1421,21 +1421,21 @@ public class TigerParser implements TigerParserConstants {
         throw new ParseException();
       }
       t = jj_consume_token(IDENTIFIER);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LT:
         type_params = TypeParameters();
         break;
       default:
         ;
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case EXTENDS:
         extends_list = ExtendsList(isInterface);
         break;
       default:
         ;
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case IMPLEMENTS:
         implements_list = ImplementsList(isInterface);
         break;
@@ -1494,7 +1494,7 @@ public class TigerParser implements TigerParserConstants {
                                                  list.add(type_s);
       label_16:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -1528,7 +1528,7 @@ public class TigerParser implements TigerParserConstants {
                                                      list.add(type_s);
       label_17:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -1558,7 +1558,7 @@ public class TigerParser implements TigerParserConstants {
     try {
       start_t = jj_consume_token(ENUM);
       t = jj_consume_token(IDENTIFIER);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case IMPLEMENTS:
         ImplementsList(false);
         break;
@@ -1608,7 +1608,7 @@ public class TigerParser implements TigerParserConstants {
                                   constants.add(constant);
       label_18:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -1619,12 +1619,12 @@ public class TigerParser implements TigerParserConstants {
         constant = EnumConstant();
         constants.add(constant);
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case SEMICOLON:
         jj_consume_token(SEMICOLON);
         label_19:
         while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case ABSTRACT:
           case BOOLEAN:
           case BYTE:
@@ -1684,14 +1684,14 @@ public class TigerParser implements TigerParserConstants {
     TigerNode node = null;
     try {
       t = jj_consume_token(IDENTIFIER);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LPAREN:
         Arguments();
         break;
       default:
         ;
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LBRACE:
         ClassOrInterfaceBody(false);
         break;
@@ -1724,7 +1724,7 @@ public class TigerParser implements TigerParserConstants {
               s += a;
       label_20:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -1749,7 +1749,7 @@ public class TigerParser implements TigerParserConstants {
     Token t = null;
     try {
       t = jj_consume_token(IDENTIFIER);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case EXTENDS:
         s = TypeBound();
         break;
@@ -1778,7 +1778,7 @@ public class TigerParser implements TigerParserConstants {
               s += " " + type_a.toString();
       label_21:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BIT_AND:
           ;
           break;
@@ -1812,7 +1812,7 @@ public class TigerParser implements TigerParserConstants {
       start_t = jj_consume_token(LBRACE);
       label_22:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case ABSTRACT:
         case BOOLEAN:
         case BYTE:
@@ -1993,7 +1993,7 @@ public class TigerParser implements TigerParserConstants {
                   results.incReferenceFieldCount();
       label_23:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -2027,7 +2027,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> list = null;
     try {
       s = VariableDeclaratorId();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case ASSIGN:
         jj_consume_token(ASSIGN);
         list = VariableInitializer();
@@ -2051,7 +2051,7 @@ public class TigerParser implements TigerParserConstants {
       t = jj_consume_token(IDENTIFIER);
       label_24:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LBRACKET:
           ;
           break;
@@ -2077,7 +2077,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> list = new ArrayList<TigerNode>();
     List<TigerNode> a = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LBRACE:
         a = ArrayInitializer();
         break;
@@ -2129,7 +2129,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> b = null;
     try {
       jj_consume_token(LBRACE);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -2175,7 +2175,7 @@ public class TigerParser implements TigerParserConstants {
       default:
         ;
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case COMMA:
         jj_consume_token(COMMA);
         break;
@@ -2203,7 +2203,7 @@ public class TigerParser implements TigerParserConstants {
     Location endLoc = null;
     Token t = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case LT:
         type_params = TypeParameters();
         break;
@@ -2271,7 +2271,7 @@ public class TigerParser implements TigerParserConstants {
       f = FormalParameters();
       label_26:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LBRACKET:
           ;
           break;
@@ -2362,7 +2362,7 @@ public class TigerParser implements TigerParserConstants {
             }
       type_a = Type();
          param.setType(type_a);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case ELLIPSIS:
         jj_consume_token(ELLIPSIS);
           param.setVarArg(true);
@@ -2507,7 +2507,7 @@ public class TigerParser implements TigerParserConstants {
         Arguments();
         jj_consume_token(SEMICOLON);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BOOLEAN:
         case BYTE:
         case CHAR:
@@ -2558,7 +2558,7 @@ public class TigerParser implements TigerParserConstants {
     Token t = null;
     BlockNode block = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case STATIC:
         t = jj_consume_token(STATIC);
         break;
@@ -2589,7 +2589,7 @@ public class TigerParser implements TigerParserConstants {
       if (jj_2_24(2)) {
         s = ReferenceType();
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BOOLEAN:
         case BYTE:
         case CHAR:
@@ -2617,7 +2617,7 @@ public class TigerParser implements TigerParserConstants {
     boolean isArray = false;
     int dimensions = 0;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -2631,7 +2631,7 @@ public class TigerParser implements TigerParserConstants {
         while (true) {
           jj_consume_token(LBRACKET);
           jj_consume_token(RBRACKET);
-                                                       isArray = true; ++dimensions;
+          isArray = true; ++dimensions;
           if (jj_2_25(2)) {
             ;
           } else {
@@ -2733,7 +2733,7 @@ public class TigerParser implements TigerParserConstants {
                                if (a != null) list.add(a);
       label_32:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -2757,7 +2757,7 @@ public class TigerParser implements TigerParserConstants {
     String s = "";
     String a = "";
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -2771,7 +2771,7 @@ public class TigerParser implements TigerParserConstants {
         break;
       case HOOK:
         jj_consume_token(HOOK);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case EXTENDS:
         case SUPER:
           type = WildcardBounds();
@@ -2796,7 +2796,7 @@ public class TigerParser implements TigerParserConstants {
     Type type = null;
     String s = "";
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case EXTENDS:
         jj_consume_token(EXTENDS);
         type = ReferenceType();
@@ -2824,7 +2824,7 @@ public class TigerParser implements TigerParserConstants {
     Token t = null;
     Type s = new Type();
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
         t = jj_consume_token(BOOLEAN);
                         s.type = "boolean";
@@ -2877,7 +2877,7 @@ public class TigerParser implements TigerParserConstants {
     Token t;
     Type s = new Type();
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case VOID:
         t = jj_consume_token(VOID);
             s.type = "void";
@@ -2974,7 +2974,7 @@ public class TigerParser implements TigerParserConstants {
                     nameList.add(tn);
       label_34:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -3015,7 +3015,7 @@ public class TigerParser implements TigerParserConstants {
   }
 
   final public void AssignmentOperator() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case ASSIGN:
       jj_consume_token(ASSIGN);
       break;
@@ -3064,7 +3064,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> c = null;
     try {
       a = ConditionalOrExpression();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case HOOK:
         jj_consume_token(HOOK);
         b = Expression();
@@ -3090,7 +3090,7 @@ public class TigerParser implements TigerParserConstants {
       a = ConditionalAndExpression();
       label_35:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case SC_OR:
           ;
           break;
@@ -3115,7 +3115,7 @@ public class TigerParser implements TigerParserConstants {
       a = InclusiveOrExpression();
       label_36:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case SC_AND:
           ;
           break;
@@ -3140,7 +3140,7 @@ public class TigerParser implements TigerParserConstants {
       a = ExclusiveOrExpression();
       label_37:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BIT_OR:
           ;
           break;
@@ -3165,7 +3165,7 @@ public class TigerParser implements TigerParserConstants {
       a = AndExpression();
       label_38:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case XOR:
           ;
           break;
@@ -3190,7 +3190,7 @@ public class TigerParser implements TigerParserConstants {
       a = EqualityExpression();
       label_39:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BIT_AND:
           ;
           break;
@@ -3216,7 +3216,7 @@ public class TigerParser implements TigerParserConstants {
       a = InstanceOfExpression();
       label_40:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case EQ:
         case NE:
           ;
@@ -3224,7 +3224,7 @@ public class TigerParser implements TigerParserConstants {
         default:
           break label_40;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case EQ:
           jj_consume_token(EQ);
           break;
@@ -3250,7 +3250,7 @@ public class TigerParser implements TigerParserConstants {
     Type t = null;
     try {
       a = RelationalExpression();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case INSTANCEOF:
         jj_consume_token(INSTANCEOF);
         t = Type();
@@ -3275,7 +3275,7 @@ public class TigerParser implements TigerParserConstants {
       a = ShiftExpression();
       label_41:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LT:
         case LE:
         case GE:
@@ -3285,7 +3285,7 @@ public class TigerParser implements TigerParserConstants {
         default:
           break label_41;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LT:
           jj_consume_token(LT);
           break;
@@ -3324,7 +3324,7 @@ public class TigerParser implements TigerParserConstants {
         } else {
           break label_42;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LSHIFT:
           jj_consume_token(LSHIFT);
           break;
@@ -3355,7 +3355,7 @@ public class TigerParser implements TigerParserConstants {
       a = MultiplicativeExpression();
       label_43:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case PLUS:
         case MINUS:
           ;
@@ -3363,7 +3363,7 @@ public class TigerParser implements TigerParserConstants {
         default:
           break label_43;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case PLUS:
           jj_consume_token(PLUS);
           break;
@@ -3393,7 +3393,7 @@ public class TigerParser implements TigerParserConstants {
                               if (a != null) list.add(a);
       label_44:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case STAR:
         case SLASH:
         case REM:
@@ -3402,7 +3402,7 @@ public class TigerParser implements TigerParserConstants {
         default:
           break label_44;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case STAR:
           jj_consume_token(STAR);
           break;
@@ -3429,10 +3429,10 @@ public class TigerParser implements TigerParserConstants {
   final public TigerNode UnaryExpression() throws ParseException {
     TigerNode tn = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case PLUS:
       case MINUS:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case PLUS:
           jj_consume_token(PLUS);
           break;
@@ -3514,10 +3514,10 @@ public class TigerParser implements TigerParserConstants {
   final public TigerNode UnaryExpressionNotPlusMinus() throws ParseException {
     TigerNode tn = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BANG:
       case TILDE:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case TILDE:
           jj_consume_token(TILDE);
           break;
@@ -3534,7 +3534,7 @@ public class TigerParser implements TigerParserConstants {
         if (jj_2_35(2147483647)) {
           tn = CastExpression();
         } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case BOOLEAN:
           case BYTE:
           case CHAR:
@@ -3586,12 +3586,12 @@ public class TigerParser implements TigerParserConstants {
         jj_consume_token(LBRACKET);
         jj_consume_token(RBRACKET);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LPAREN:
           jj_consume_token(LPAREN);
           Type();
           jj_consume_token(RPAREN);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case TILDE:
             jj_consume_token(TILDE);
             break;
@@ -3641,10 +3641,10 @@ public class TigerParser implements TigerParserConstants {
     TigerNode tn = null;
     try {
       tn = PrimaryExpression();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case INCR:
       case DECR:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case INCR:
           jj_consume_token(INCR);
           break;
@@ -3676,7 +3676,7 @@ public class TigerParser implements TigerParserConstants {
         jj_consume_token(RPAREN);
         tn = UnaryExpression();
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LPAREN:
           jj_consume_token(LPAREN);
           t = Type();
@@ -3758,7 +3758,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> list = null;
     TigerNode tn = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case FALSE:
       case NULL:
       case TRUE:
@@ -3790,7 +3790,7 @@ public class TigerParser implements TigerParserConstants {
           jj_consume_token(DOT);
           jj_consume_token(IDENTIFIER);
         } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case LPAREN:
             jj_consume_token(LPAREN);
             list = Expression();
@@ -3808,7 +3808,7 @@ public class TigerParser implements TigerParserConstants {
               jj_consume_token(DOT);
               jj_consume_token(CLASS);
             } else {
-              switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+              switch (get_ntk()) {
               case IDENTIFIER:
                 tn = Name();
                           if (tn != null ) expressions.add(tn);
@@ -3840,7 +3840,7 @@ public class TigerParser implements TigerParserConstants {
       } else if (jj_2_45(3)) {
         list = MemberSelector();
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LBRACKET:
           jj_consume_token(LBRACKET);
           list = Expression();
@@ -3868,7 +3868,7 @@ public class TigerParser implements TigerParserConstants {
 
   final public void Literal() throws ParseException {
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case INTEGER_LITERAL:
         jj_consume_token(INTEGER_LITERAL);
         break;
@@ -3898,7 +3898,7 @@ public class TigerParser implements TigerParserConstants {
   }
 
   final public void BooleanLiteral() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case TRUE:
       jj_consume_token(TRUE);
       break;
@@ -3919,7 +3919,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> a = null;
     try {
       jj_consume_token(LPAREN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -3968,7 +3968,7 @@ public class TigerParser implements TigerParserConstants {
                         if (a != null) list.addAll(a);
       label_46:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -3999,12 +3999,12 @@ public class TigerParser implements TigerParserConstants {
         a = ArrayDimsAndInits();
                                                                                              if (a != null) list.addAll(a);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case NEW:
           jj_consume_token(NEW);
           tn = ClassOrInterfaceType();
                                             if (tn != null) list.add(tn);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case LT:
             a = TypeArguments();
                                                                                                   if (a != null) list.addAll(a);
@@ -4012,7 +4012,7 @@ public class TigerParser implements TigerParserConstants {
           default:
             ;
           }
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case LBRACKET:
             a = ArrayDimsAndInits();
                                        if (a != null) list.addAll(a);
@@ -4020,7 +4020,7 @@ public class TigerParser implements TigerParserConstants {
           case LPAREN:
             a = Arguments();
                                 if (a != null) list.addAll(a);
-            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            switch (get_ntk()) {
             case LBRACE:
               tn = ClassOrInterfaceBody(false);
                                                                                                     if (tn != null) list.add(tn);
@@ -4078,13 +4078,13 @@ public class TigerParser implements TigerParserConstants {
           jj_consume_token(RBRACKET);
         }
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case LBRACKET:
           label_49:
           while (true) {
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
-            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            switch (get_ntk()) {
             case LBRACKET:
               ;
               break;
@@ -4208,7 +4208,7 @@ public class TigerParser implements TigerParserConstants {
     try {
       jj_consume_token(ASSERT);
       Expression();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case COLON:
         jj_consume_token(COLON);
         Expression();
@@ -4366,7 +4366,7 @@ public class TigerParser implements TigerParserConstants {
           break;
         case CLASS:
         case INTERFACE:
-        	Modifier m = new Modifier();
+          Modifier m = new Modifier();
           tn = ClassOrInterfaceDeclaration(m);
           break;
         default:
@@ -4472,7 +4472,7 @@ public class TigerParser implements TigerParserConstants {
       } else if (jj_2_54(3)) {
         tn = MethodDeclaration(modifiers);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case ASSERT:
         case BOOLEAN:
         case BREAK:
@@ -4558,7 +4558,7 @@ public class TigerParser implements TigerParserConstants {
             results.incReferenceFieldCount();
       label_52:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -4586,7 +4586,7 @@ public class TigerParser implements TigerParserConstants {
     TigerNode tn = null;
     List<TigerNode> list = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case INCR:
         tn = PreIncrementExpression();
         break;
@@ -4615,7 +4615,7 @@ public class TigerParser implements TigerParserConstants {
       case IDENTIFIER:
       case LPAREN:
         tn = PrimaryExpression();
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case ASSIGN:
         case INCR:
         case DECR:
@@ -4630,7 +4630,7 @@ public class TigerParser implements TigerParserConstants {
         case LSHIFTASSIGN:
         case RSIGNEDSHIFTASSIGN:
         case RUNSIGNEDSHIFTASSIGN:
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case INCR:
             jj_consume_token(INCR);
             break;
@@ -4777,7 +4777,7 @@ public class TigerParser implements TigerParserConstants {
   final public List<TigerNode> SwitchLabel() throws ParseException {
     List<TigerNode> list = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case CASE:
         jj_consume_token(CASE);
         list = Expression();
@@ -4810,7 +4810,7 @@ public class TigerParser implements TigerParserConstants {
       expression = Expression();
       jj_consume_token(RPAREN);
       ifNodes = Statement();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case ELSE:
         jj_consume_token(ELSE);
         elseNodes = Statement();
@@ -4988,7 +4988,7 @@ public class TigerParser implements TigerParserConstants {
             ;
           }
           jj_consume_token(SEMICOLON);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case BOOLEAN:
           case BYTE:
           case CHAR:
@@ -5022,7 +5022,7 @@ public class TigerParser implements TigerParserConstants {
             ;
           }
           jj_consume_token(SEMICOLON);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          switch (get_ntk()) {
           case BOOLEAN:
           case BYTE:
           case CHAR:
@@ -5088,7 +5088,7 @@ public class TigerParser implements TigerParserConstants {
         tn = LocalVariableDeclaration();
                                           if (tn != null) list.add(tn);
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case BOOLEAN:
         case BYTE:
         case CHAR:
@@ -5136,7 +5136,7 @@ public class TigerParser implements TigerParserConstants {
                                   if (a != null) list.add(a);
       label_55:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -5164,7 +5164,7 @@ public class TigerParser implements TigerParserConstants {
 
   final public void BreakStatement() throws ParseException {
     jj_consume_token(BREAK);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case IDENTIFIER:
       jj_consume_token(IDENTIFIER);
       break;
@@ -5176,7 +5176,7 @@ public class TigerParser implements TigerParserConstants {
 
   final public void ContinueStatement() throws ParseException {
     jj_consume_token(CONTINUE);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (get_ntk()) {
     case IDENTIFIER:
       jj_consume_token(IDENTIFIER);
       break;
@@ -5190,7 +5190,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> list = null;
     try {
       jj_consume_token(RETURN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -5283,7 +5283,7 @@ public class TigerParser implements TigerParserConstants {
       if (child != null) { child.setName("try"); nodes.add(child); last = child;}
       label_56:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case CATCH:
           ;
           break;
@@ -5297,7 +5297,7 @@ public class TigerParser implements TigerParserConstants {
         child = Block();
         if (child != null) { child.setName("catch"); nodes.add(child); if (exception != null) { child.addChild(exception); } last = child; }
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case FINALLY:
         jj_consume_token(FINALLY);
         child = Block();
@@ -5357,7 +5357,7 @@ public class TigerParser implements TigerParserConstants {
       } else if (jj_2_58(2147483647)) {
         list = SingleMemberAnnotation();
       } else {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case AT:
           list = MarkerAnnotation();
           break;
@@ -5382,7 +5382,7 @@ public class TigerParser implements TigerParserConstants {
       nn = Name();
                       nn.setName("@" + nn.getName());
       jj_consume_token(LPAREN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case IDENTIFIER:
         mvp = MemberValuePairs();
         break;
@@ -5447,7 +5447,7 @@ public class TigerParser implements TigerParserConstants {
                           list.addAll(mvp);
       label_57:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           ;
           break;
@@ -5486,7 +5486,7 @@ public class TigerParser implements TigerParserConstants {
   final public List<TigerNode> MemberValue() throws ParseException {
     List<TigerNode> list = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case AT:
         list = Annotation();
         break;
@@ -5538,7 +5538,7 @@ public class TigerParser implements TigerParserConstants {
     List<TigerNode> mv = null;
     try {
       jj_consume_token(LBRACE);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (get_ntk()) {
       case BOOLEAN:
       case BYTE:
       case CHAR:
@@ -5581,7 +5581,7 @@ public class TigerParser implements TigerParserConstants {
           mv = MemberValue();
                                                                                 list.addAll(mv);
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (get_ntk()) {
         case COMMA:
           jj_consume_token(COMMA);
           break;
