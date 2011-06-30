@@ -75,8 +75,8 @@ public class QuickAccessSourcePath
         // z -> [Zebra.java]
         
         private Map<String, List> mQuickAccessMap;
-
-	    private HashMap<String, Boolean> projectsFiles;
+        
+        private HashMap<String, Boolean> projectsFiles;
         
         /**
          * Substring index size - this integer determines how many characters should
